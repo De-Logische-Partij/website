@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#FAFAF8">
+<title>Denk mee | De Logische Partij</title>
+<meta name="description" content="Stuur een vraag of standpunt in bij De Logische Partij. Wij overwegen elke inzending.">
+<link rel="canonical" href="https://delogischepartij.nl/inzenden/">
+
+<!-- Open Graph -->
+<meta property="og:title" content="Denk mee | De Logische Partij">
+<meta property="og:description" content="Stuur een vraag of standpunt in bij De Logische Partij.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://delogischepartij.nl/inzenden/">
+<meta property="og:locale" content="nl_NL">
+<meta property="og:site_name" content="De Logische Partij">
+<meta property="og:image" content="https://delogischepartij.nl/images/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="De Logische Partij | Het kan logischer.">
+
+<link rel="stylesheet" href="https://unpkg.com/lucide-static@latest/font/lucide.css">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Spring naar inhoud</a>
+
+<nav aria-label="Hoofdnavigatie">
+  <a href="/" class="nav-logo"><span class="mark">DLP</span> De Logische Partij</a>
+  <button class="nav-toggle" aria-label="Menu openen" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-links">
+    <a href="/#probleem">Probleem</a>
+    <a href="/#programma">Programma</a>
+    <a href="/standpunten/">Standpunten</a>
+    <a href="/vragen/">Vragen</a>
+    <a href="/#visie">Visie</a>
+    <a href="/#steun" class="nav-cta">Steun DLP</a>
+  </div>
+</nav>
+
+<main id="main-content">
+  <section class="hero hero--short">
+    <div class="hero-content">
+      <div class="hero-tag">Denk mee</div>
+      <h1>Denk mee</h1>
+      <p class="hero-sub">Heb je een vraag die gesteld moet worden? Of een standpunt dat wij moeten overwegen? Stuur het in.</p>
+    </div>
+  </section>
+
+  <section class="inzenden-section" id="inzenden">
+    <div class="section-inner inzenden-inner">
+      <div class="inzenden-type-keuze" role="group" aria-label="Kies type inzending">
+        <button class="inzenden-type-btn active" data-type="vraag">
+          <i class="lucide lucide-help-circle" aria-hidden="true"></i>
+          Ik wil een vraag insturen
+        </button>
+        <button class="inzenden-type-btn" data-type="standpunt">
+          <i class="lucide lucide-lightbulb" aria-hidden="true"></i>
+          Ik wil een standpunt voorstellen
+        </button>
+      </div>
+
+      <p class="inzenden-hint" id="inzenden-hint">Beschrijf de context en formuleer je vraag zo concreet mogelijk.</p>
+
+      <form class="inzenden-form" id="inzenden-form" novalidate>
+        <div class="inzenden-form-row">
+          <div class="inzenden-field">
+            <label for="inzend-naam">Naam <span class="inzenden-required">*</span></label>
+            <input type="text" id="inzend-naam" required class="inzenden-input" placeholder="Je naam" autocomplete="name">
+          </div>
+          <div class="inzenden-field">
+            <label for="inzend-email">E-mail <span class="inzenden-required">*</span></label>
+            <input type="email" id="inzend-email" required class="inzenden-input" placeholder="je@email.nl" autocomplete="email">
+            <span class="inzenden-field-hint">Wordt niet gedeeld</span>
+          </div>
+        </div>
+
+        <div class="inzenden-field">
+          <label for="inzend-titel">Titel <span class="inzenden-required">*</span></label>
+          <input type="text" id="inzend-titel" required class="inzenden-input" placeholder="Korte, duidelijke titel">
+        </div>
+
+        <div class="inzenden-field">
+          <label for="inzend-inhoud">Inhoud <span class="inzenden-required">*</span></label>
+          <textarea id="inzend-inhoud" required class="inzenden-textarea" rows="8" maxlength="5000" placeholder="Schrijf hier je vraag of standpunt..."></textarea>
+          <span class="inzenden-charcount" id="inzend-charcount">0 / 5000</span>
+        </div>
+
+        <div class="inzenden-actions">
+          <button type="submit" class="btn-primary" id="inzend-submit">
+            <i class="lucide lucide-send" aria-hidden="true"></i> Insturen
+          </button>
+        </div>
+
+        <div class="inzenden-feedback" id="inzend-feedback" hidden></div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>&copy; 2026 De Logische Partij (DLP)</span>
+  <span><a href="/">Home</a> · <a href="/standpunten/">Standpunten</a> · <a href="/vragen/">Vragen</a> · <a href="/transparantie/">Transparantie</a> · <a href="/inzenden/">Denk mee</a> · <a href="mailto:steun@delogischepartij.nl">Contact</a></span>
+</footer>
+
+<div class="cookie-banner" id="cookie-banner">
+  <p>Deze site plaatst geen tracking cookies en verzamelt geen persoonsgegevens.</p>
+  <button class="cookie-btn" id="cookie-dismiss" onclick="this.parentElement.classList.remove('visible');try{localStorage.setItem('cookie-dismissed','1')}catch(e){}">Begrepen</button>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+(function () {
+  var API = '/api';
+  var form = document.getElementById('inzenden-form');
+  var hint = document.getElementById('inzenden-hint');
+  var feedback = document.getElementById('inzend-feedback');
+  var submitBtn = document.getElementById('inzend-submit');
+  var charcount = document.getElementById('inzend-charcount');
+  var textarea = document.getElementById('inzend-inhoud');
+  var typeBtns = document.querySelectorAll('.inzenden-type-btn');
+
+  var activeType = 'vraag';
+
+  var hints = {
+    vraag: 'Beschrijf de context en formuleer je vraag zo concreet mogelijk.',
+    standpunt: 'Beschrijf het standpunt en waarom je vindt dat DLP dit moet overwegen.'
+  };
+
+  var placeholders = {
+    vraag: 'Schrijf hier je vraag...',
+    standpunt: 'Schrijf hier je standpunt...'
+  };
+
+  typeBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      typeBtns.forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      activeType = btn.getAttribute('data-type');
+      hint.textContent = hints[activeType];
+      textarea.placeholder = placeholders[activeType];
+      hideFeedback();
+    });
+  });
+
+  textarea.addEventListener('input', function () {
+    charcount.textContent = textarea.value.length + ' / 5000';
+  });
+
+  function showFeedback(text, isError) {
+    feedback.textContent = text;
+    feedback.className = 'inzenden-feedback' + (isError ? ' inzenden-feedback--error' : ' inzenden-feedback--success');
+    feedback.hidden = false;
+  }
+
+  function hideFeedback() {
+    feedback.hidden = true;
+  }
+
+  var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    hideFeedback();
+
+    var naam = document.getElementById('inzend-naam').value.trim();
+    var email = document.getElementById('inzend-email').value.trim();
+    var titel = document.getElementById('inzend-titel').value.trim();
+    var inhoud = textarea.value.trim();
+
+    if (!naam || !email || !titel || !inhoud) {
+      showFeedback('Vul alle verplichte velden in.', true);
+      return;
+    }
+
+    if (!emailPattern.test(email)) {
+      showFeedback('Vul een geldig e-mailadres in.', true);
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'Bezig...';
+
+    fetch(API + '/inzendingen', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: activeType,
+        naam: naam,
+        email: email,
+        titel: titel,
+        inhoud: inhoud
+      })
+    })
+      .then(function (res) {
+        if (!res.ok) throw new Error(res.status);
+        return res.json();
+      })
+      .then(function () {
+        showFeedback('Bedankt voor je inzending. We nemen het in overweging.', false);
+        form.reset();
+        charcount.textContent = '0 / 5000';
+      })
+      .catch(function () {
+        showFeedback('Kon de inzending niet versturen. Probeer het later opnieuw.', true);
+      })
+      .finally(function () {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="lucide lucide-send" aria-hidden="true"></i> Insturen';
+      });
+  });
+})();
+</script>
+</body>
+</html>

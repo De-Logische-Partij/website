@@ -7,6 +7,8 @@ import supporters from "./routes/supporters";
 import { standpunten, adminStandpunten } from "./routes/standpunten";
 import { vragen, adminVragen } from "./routes/vragen";
 import { discussie, adminDiscussie } from "./routes/discussie";
+import { inzendingen, adminInzendingen } from "./routes/inzendingen";
+import begroting from "./routes/begroting";
 
 const app = new Hono();
 
@@ -26,6 +28,9 @@ app.route("/api/vragen", vragen);
 app.route("/api/admin/vragen", adminVragen);
 app.route("/api/discussie", discussie);
 app.route("/api/admin/discussie", adminDiscussie);
+app.route("/api/inzendingen", inzendingen);
+app.route("/api/admin/inzendingen", adminInzendingen);
+app.route("/api/begroting", begroting);
 
 app.use("/*", serveStatic({ root: "../../public" }));
 

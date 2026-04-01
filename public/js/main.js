@@ -132,11 +132,11 @@
   var dismissBtn = document.getElementById('cookie-dismiss');
   if (banner && dismissBtn) {
     if (!localStorage.getItem('cookie-dismissed')) {
-      banner.hidden = false;
+      banner.classList.add('visible');
     }
     dismissBtn.addEventListener('click', function () {
-      banner.hidden = true;
-      localStorage.setItem('cookie-dismissed', '1');
+      banner.classList.remove('visible');
+      try { localStorage.setItem('cookie-dismissed', '1'); } catch(e) {}
     });
   }
 

@@ -84,12 +84,12 @@
 
 <footer>
   <span>&copy; 2026 De Logische Partij (DLP)</span>
-  <span><a href="/">Home</a> · <a href="/standpunten/">Standpunten</a> · <a href="/vragen/">Vragen</a> · <a href="/transparantie/">Transparantie</a> · <a href="mailto:steun@delogischepartij.nl">Contact</a></span>
+  <span><a href="/">Home</a> · <a href="/standpunten/">Standpunten</a> · <a href="/vragen/">Vragen</a> · <a href="/transparantie/">Transparantie</a> · <a href="/inzenden/">Denk mee</a> · <a href="mailto:steun@delogischepartij.nl">Contact</a></span>
 </footer>
 
-<div class="cookie-banner" id="cookie-banner" hidden>
+<div class="cookie-banner" id="cookie-banner">
   <p>Deze site plaatst geen tracking cookies en verzamelt geen persoonsgegevens.</p>
-  <button class="cookie-btn" id="cookie-dismiss" onclick="this.parentElement.hidden=true;try{localStorage.setItem('cookie-dismissed','1')}catch(e){}">Begrepen</button>
+  <button class="cookie-btn" id="cookie-dismiss" onclick="this.parentElement.classList.remove('visible');try{localStorage.setItem('cookie-dismissed','1')}catch(e){}">Begrepen</button>
 </div>
 
 <script src="/js/main.js"></script>

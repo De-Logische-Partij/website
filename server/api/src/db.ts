@@ -197,6 +197,15 @@ if (standpuntenCount.n === 0) {
       "Straffen alleen lost niets op. De oorzaken van criminaliteit liggen vaak in armoede, uitzichtloosheid en gebrek aan kansen. DLP wil investeren in preventie: betere omstandigheden, toegang tot onderwijs en werk, en sterke sociale vangnetten. Mensen die in de fout zijn gegaan verdienen een eerlijke weg terug de samenleving in. Met begeleiding, omscholing en werk voorkomen we terugval. Decriminalisering waar dat logisch is, en een rechtssysteem dat gericht is op herstel in plaats van alleen vergelding. Zo bouwen we aan een veiligere samenleving voor iedereen.",
       JSON.stringify(["Autonomie", "Logica", "Vrijheid"])
     );
+
+    insertStandpunt.run(
+      "schone-lei-corona-ondernemers",
+      "Schone lei voor corona-ondernemers",
+      "Economie",
+      "Ondernemers die tijdens de coronacrisis hun verantwoordelijkheid namen, verdienen een eerlijke kans op herstel. Kwijtschelding op basis van draagkracht, langere terugbetaaltermijnen en een soepeler doorstartbeleid.",
+      "Tijdens de coronacrisis hebben ondernemers gedaan wat de samenleving van hen vroeg: deuren sluiten, personeel aanhouden, doorbetalen waar mogelijk. Nu, jaren later, worden ze geconfronteerd met opgestapelde belastingschulden die onmogelijk in het huidige tempo terugbetaald kunnen worden. DLP stelt drie maatregelen voor: (1) Kwijtschelding van corona-belastingschulden op basis van draagkracht, getoetst door een onafhankelijke commissie. (2) Terugbetaaltermijnen van minimaal tien jaar, met termijnen afgestemd op de actuele winst. (3) Recht op doorstart na faillissement binnen een jaar, via versnelde schuldsanering (WHOA) en verkorte BKR-registratie. Een ondernemer die weer op de been komt, creëert banen, betaalt belasting en draagt bij aan de welvaart. Dat levert meer op dan volledige invordering.",
+      JSON.stringify(["Logica", "Vrijheid", "Autonomie"])
+    );
   });
 
   seedStandpunten();
@@ -295,6 +304,34 @@ db.exec(`
     created_at TEXT DEFAULT (datetime('now')),
     UNIQUE(discussie_id, ip_hash),
     FOREIGN KEY (discussie_id) REFERENCES discussies(id)
+  )
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS inzendingen (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    type TEXT NOT NULL CHECK(type IN ('vraag', 'standpunt')),
+    naam TEXT NOT NULL,
+    email_hash TEXT NOT NULL,
+    titel TEXT NOT NULL,
+    inhoud TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'nieuw' CHECK(status IN ('nieuw', 'in_behandeling', 'goedgekeurd', 'afgewezen')),
+    reactie_admin TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+  )
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS begroting_cache (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    jaar INTEGER NOT NULL,
+    fase TEXT NOT NULL,
+    vuo TEXT NOT NULL,
+    hoofdstuk_nummer TEXT,
+    data TEXT NOT NULL,
+    fetched_at TEXT DEFAULT (datetime('now')),
+    UNIQUE(jaar, fase, vuo, hoofdstuk_nummer)
   )
 `);
 
