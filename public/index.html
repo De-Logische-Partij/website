@@ -58,9 +58,7 @@
 }
 </script>
 
-<!-- Analytics: Plausible — privacy-vriendelijk, geen cookies, AVG-compliant -->
-<!-- Activeer door data-domain in te vullen na het aanmaken van een Plausible account -->
-<script defer data-domain="delogischepartij.nl" src="https://plausible.io/js/script.js"></script>
+
 
 <link rel="stylesheet" href="https://unpkg.com/lucide-static@latest/font/lucide.css">
 <link rel="stylesheet" href="/css/style.css">
@@ -77,6 +75,7 @@
   <div class="nav-links">
     <a href="#probleem">Probleem</a>
     <a href="#programma">Programma</a>
+    <a href="/standpunten/">Standpunten</a>
     <a href="#visie">Visie</a>
     <a href="#steun" class="nav-cta">Steun DLP</a>
   </div>
@@ -193,6 +192,8 @@
         <div class="vision-card"><i class="lucide lucide-lightbulb vision-icon" aria-hidden="true"></i><h3>Kenniseconomie 2.0</h3><p>Investering in R&D, minder barrières voor startups, onderwijs dat systeemdenken beloont.</p></div>
         <div class="vision-card"><i class="lucide lucide-link vision-icon" aria-hidden="true"></i><h3>Blockchain voor vertrouwen</h3><p>Publieke uitgaven op de blockchain. Stemmen verifieerbaar. Identiteit decentraal.</p></div>
         <div class="vision-card"><i class="lucide lucide-wifi vision-icon" aria-hidden="true"></i><h3>Internet als nutsvoorziening</h3><p>Snel, betaalbaar en privé internet voor iedereen. Een basisrecht in de digitale samenleving.</p></div>
+        <div class="vision-card"><i class="lucide lucide-shield vision-icon" aria-hidden="true"></i><h3>Minister van AI en Technologie</h3><p>De digitale transformatie verdient een eigen plek aan de kabinettafel. Een minister die AI, robotica, digitale infrastructuur en cyberveiligheid als kernverantwoordelijkheid heeft.</p></div>
+        <div class="vision-card"><i class="lucide lucide-trending-up vision-icon" aria-hidden="true"></i><h3>Nederland als tech-hub van Europa</h3><p>Een investeringsklimaat waarin startups floreren, durfkapitaal groeit en Nederlandse tech-bedrijven wereldwijd meespelen. Van eigen AI-modellen tot eigen sociale platformen en datacenters.</p></div>
       </div>
     </div>
   </section>
@@ -201,6 +202,7 @@
     <div class="manifesto-bar"></div>
     <blockquote>Wij geloven dat <strong>logisch denken</strong> de basis is van goed bestuur. Dat <strong>technologie</strong> de burger versterkt. En dat een <strong>kleine overheid</strong> een slimme overheid is.</blockquote>
     <cite>— De Logische Partij</cite>
+    <p class="manifesto-addendum">Onze standpunten zijn levend. We passen ze aan als we iets beters leren. Niet omdat we twijfelen, maar omdat we eerlijk willen zijn.</p>
   </section>
 
   <section class="founder">
@@ -286,8 +288,8 @@
 </footer>
 
 <div class="cookie-banner" id="cookie-banner" hidden>
-  <p>Deze site gebruikt geen tracking cookies. We gebruiken Plausible Analytics, dat volledig privacy-vriendelijk is en geen cookies plaatst.</p>
-  <button class="cookie-btn" id="cookie-dismiss">Begrepen</button>
+  <p>Deze site plaatst geen tracking cookies en verzamelt geen persoonsgegevens.</p>
+  <button class="cookie-btn" id="cookie-dismiss" onclick="this.parentElement.hidden=true;try{localStorage.setItem('cookie-dismissed','1')}catch(e){}">Begrepen</button>
 </div>
 
 <script src="/js/main.js"></script>

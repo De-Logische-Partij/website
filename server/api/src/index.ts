@@ -4,6 +4,7 @@ import { serveStatic } from "hono/bun";
 import financien from "./routes/financien";
 import aanmelden from "./routes/aanmelden";
 import supporters from "./routes/supporters";
+import { standpunten, adminStandpunten } from "./routes/standpunten";
 
 const app = new Hono();
 
@@ -17,6 +18,8 @@ app.use(
 app.route("/api/financien", financien);
 app.route("/api/aanmelden", aanmelden);
 app.route("/api/supporters", supporters);
+app.route("/api/standpunten", standpunten);
+app.route("/api/admin/standpunten", adminStandpunten);
 
 app.use("/*", serveStatic({ root: "../../public" }));
 

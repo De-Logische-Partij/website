@@ -449,7 +449,7 @@ section { padding: var(--space-2xl) var(--space-lg); }
 /* ——— POINTS ——— */
 .points-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1px;
   background: var(--border);
   border: 1px solid var(--border);
@@ -583,6 +583,17 @@ section { padding: var(--space-2xl) var(--space-lg); }
   color: var(--text-muted);
   font-size: 0.8rem;
   letter-spacing: 0.05em;
+}
+
+.manifesto-addendum {
+  margin-top: 2rem;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+  font-style: italic;
 }
 
 /* ——— VALUES ——— */
@@ -1257,6 +1268,425 @@ footer a:hover { color: var(--text); }
   .hero-sub { font-size: 1rem; }
   .hero-actions { flex-direction: column; align-items: center; }
   .btn-primary, .btn-outline { width: 100%; text-align: center; }
+  .volunteer-grid { grid-template-columns: 1fr; }
+  .values { grid-template-columns: 1fr; }
+  .value { border-right: none; border-bottom: 1px solid var(--border); }
+  .value:last-child { border-bottom: none; }
+}
+
+/* ——— STANDPUNTEN ——— */
+.standpunten-callout {
+  border-left: 3px solid var(--accent);
+  background: var(--accent-subtle);
+  padding: var(--space-lg) var(--space-xl);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  margin-bottom: var(--space-xl);
+}
+
+.standpunten-callout h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: var(--space-sm);
+}
+
+.standpunten-callout p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.standpunten-section { background: var(--white); }
+
+.standpunten-filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.standpunten-search {
+  position: relative;
+  max-width: 480px;
+}
+
+.standpunten-search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 1rem;
+  font-style: normal;
+  pointer-events: none;
+}
+
+.standpunten-search input {
+  width: 100%;
+  padding: 0.85rem 1rem 0.85rem 2.8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-family: var(--font);
+  font-size: 0.95rem;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.standpunten-search input:focus {
+  border-color: var(--accent);
+}
+
+.standpunten-search input::placeholder {
+  color: var(--text-muted);
+}
+
+.standpunten-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.cat-btn {
+  padding: 0.45rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  background: var(--bg);
+  font-family: var(--font);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.cat-btn:hover {
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+
+.cat-btn.active {
+  background: var(--text);
+  color: var(--white);
+  border-color: var(--text);
+}
+
+.standpunten-statuses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.status-btn {
+  padding: 0.45rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  background: var(--bg);
+  font-family: var(--font);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.status-btn:hover {
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+
+.status-btn.active {
+  background: var(--text);
+  color: var(--white);
+  border-color: var(--text);
+}
+
+.standpunten-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.standpunten-status {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  padding: var(--space-xl) 0;
+}
+
+.standpunten-empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  padding: var(--space-xl) 0;
+}
+
+.standpunt-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.standpunt-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 24px rgba(232, 184, 0, 0.1);
+}
+
+.standpunt-header {
+  padding: var(--space-lg);
+}
+
+.standpunt-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.standpunt-header p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-bottom: var(--space-md);
+}
+
+.standpunt-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-sm);
+}
+
+.badge--standpunt {
+  background: var(--accent-light);
+  color: var(--accent-label);
+}
+
+.badge--concept {
+  background: var(--surface);
+  color: var(--text-muted);
+}
+
+.badge--programma {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.badge--gewijzigd {
+  background: #FFF8E1;
+  color: #F57F17;
+}
+
+.badge--gerectificeerd {
+  background: #FFF3E0;
+  color: #E65100;
+}
+
+.badge--ingetrokken {
+  background: var(--danger-light);
+  color: var(--danger);
+}
+
+.standpunt-card--ingetrokken {
+  opacity: 0.7;
+}
+
+.standpunt-card--ingetrokken .standpunt-header h3 {
+  color: var(--text-muted);
+}
+
+.standpunt-card--ingetrokken .standpunt-header h3 s {
+  text-decoration: line-through;
+  text-decoration-color: var(--danger);
+}
+
+.standpunt-gewijzigd-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  color: #F57F17;
+  font-weight: 500;
+  margin-bottom: var(--space-sm);
+}
+
+.standpunt-gewijzigd-hint i {
+  font-size: 0.85rem;
+  font-style: normal;
+}
+
+.standpunt-rectificatie {
+  background: #FFF3E0;
+  border: 1px solid #FFE0B2;
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.standpunt-rectificatie strong {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #E65100;
+  margin-bottom: var(--space-xs);
+}
+
+.standpunt-rectificatie p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.standpunt-intrekking {
+  background: var(--danger-light);
+  border: 1px solid #FFCDD2;
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.standpunt-intrekking strong {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--danger);
+  margin-bottom: var(--space-xs);
+}
+
+.standpunt-intrekking p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.standpunt-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--accent-label);
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.standpunt-toggle:hover {
+  color: var(--text);
+}
+
+.standpunt-toggle i {
+  font-size: 0.9rem;
+  font-style: normal;
+}
+
+.standpunt-body {
+  padding: 0 var(--space-lg) var(--space-lg);
+  border-top: 1px solid var(--border);
+}
+
+.standpunt-inhoud {
+  padding-top: var(--space-lg);
+}
+
+.standpunt-inhoud p {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: var(--space-md);
+}
+
+.standpunt-inhoud p:last-child {
+  margin-bottom: 0;
+}
+
+.standpunt-historie-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  padding: 0;
+  margin-top: var(--space-md);
+  transition: color 0.2s;
+}
+
+.standpunt-historie-btn:hover {
+  color: var(--text);
+}
+
+.standpunt-historie-btn i {
+  font-size: 0.9rem;
+  font-style: normal;
+}
+
+.standpunt-historie {
+  margin-top: var(--space-md);
+}
+
+.historie-list {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.historie-item {
+  padding: 0.75rem var(--space-md);
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.historie-item:last-child {
+  border-bottom: none;
+}
+
+.historie-meta {
+  display: flex;
+  gap: var(--space-md);
+  margin-bottom: 0.25rem;
+}
+
+.historie-date {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.historie-versie {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--accent-label);
+  font-weight: 600;
+}
+
+.historie-reden {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.historie-loading,
+.historie-empty {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  padding: var(--space-sm) 0;
+}
+
+@media (max-width: 768px) {
+  .standpunten-grid { grid-template-columns: 1fr; }
+  .standpunten-callout { padding: var(--space-md); }
 }
 
 /* ——— REDUCED MOTION ——— */

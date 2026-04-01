@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#FAFAF8">
+<title>Standpunten | De Logische Partij</title>
+<meta name="description" content="Alle standpunten van De Logische Partij, open en doorzoekbaar. Bekijk onze visie op belastingen, onderwijs, democratie en meer.">
+<link rel="canonical" href="https://delogischepartij.nl/standpunten/">
+
+<!-- Open Graph -->
+<meta property="og:title" content="Standpunten | De Logische Partij">
+<meta property="og:description" content="Alle standpunten van De Logische Partij, open en doorzoekbaar.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://delogischepartij.nl/standpunten/">
+<meta property="og:locale" content="nl_NL">
+<meta property="og:site_name" content="De Logische Partij">
+<meta property="og:image" content="https://delogischepartij.nl/images/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="De Logische Partij | Het kan logischer.">
+
+<link rel="stylesheet" href="https://unpkg.com/lucide-static@latest/font/lucide.css">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Spring naar inhoud</a>
+
+<nav aria-label="Hoofdnavigatie">
+  <a href="/" class="nav-logo"><span class="mark">DLP</span> De Logische Partij</a>
+  <button class="nav-toggle" aria-label="Menu openen" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-links">
+    <a href="/#probleem">Probleem</a>
+    <a href="/#programma">Programma</a>
+    <a href="/standpunten/">Standpunten</a>
+    <a href="/#visie">Visie</a>
+    <a href="/#steun" class="nav-cta">Steun DLP</a>
+  </div>
+</nav>
+
+<main id="main-content">
+  <section class="hero hero--short">
+    <div class="hero-content">
+      <div class="hero-tag">Standpunten</div>
+      <h1>Onze standpunten</h1>
+      <p class="hero-sub">Alle standpunten van De Logische Partij, open en doorzoekbaar.</p>
+    </div>
+  </section>
+
+  <section class="standpunten-section" id="standpunten">
+    <div class="section-inner">
+      <div class="standpunten-callout">
+        <h3>Waarom standpunten kunnen veranderen</h3>
+        <p>Wij geloven in gevalideerd denken. Dat betekent dat we onze standpunten aanpassen als nieuwe inzichten, data of ervaringen daar aanleiding toe geven. Een standpunt dat achterhaald blijkt, vervangen we door een beter onderbouwd alternatief. Dat is geen zwakte, dat is hoe logisch denken werkt. We claimen niet alles zeker te weten. We zijn eerlijk over wat we nog onderzoeken en transparant over wat er verandert en waarom.</p>
+      </div>
+
+      <div class="standpunten-filters">
+        <div class="standpunten-search">
+          <i class="lucide lucide-search standpunten-search-icon" aria-hidden="true"></i>
+          <label for="standpunten-zoek" class="sr-only">Zoek standpunten</label>
+          <input type="search" id="standpunten-zoek" placeholder="Zoek standpunten..." autocomplete="off">
+        </div>
+        <div class="standpunten-categories" id="standpunten-categories" role="group" aria-label="Filter op categorie">
+          <button class="cat-btn active" data-category="alle">Alle</button>
+        </div>
+        <div class="standpunten-statuses" id="standpunten-statuses" role="group" aria-label="Filter op status">
+          <button class="status-btn active" data-status="alle">Alle</button>
+          <button class="status-btn" data-status="programma">In programma</button>
+          <button class="status-btn" data-status="concept">Concept</button>
+          <button class="status-btn" data-status="gewijzigd">Gewijzigd</button>
+          <button class="status-btn" data-status="ingetrokken">Ingetrokken</button>
+        </div>
+      </div>
+
+      <div class="standpunten-grid" id="standpunten-grid">
+        <p class="standpunten-status" id="standpunten-status">Standpunten worden geladen...</p>
+      </div>
+
+      <p class="standpunten-empty" id="standpunten-empty" hidden>Geen standpunten gevonden voor deze zoekopdracht.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>&copy; 2026 De Logische Partij (DLP)</span>
+  <span><a href="/">Home</a> · <a href="/standpunten/">Standpunten</a> · <a href="/transparantie/">Transparantie</a> · <a href="mailto:steun@delogischepartij.nl">Contact</a></span>
+</footer>
+
+<div class="cookie-banner" id="cookie-banner" hidden>
+  <p>Deze site plaatst geen tracking cookies en verzamelt geen persoonsgegevens.</p>
+  <button class="cookie-btn" id="cookie-dismiss" onclick="this.parentElement.hidden=true;try{localStorage.setItem('cookie-dismissed','1')}catch(e){}">Begrepen</button>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+(function () {
+  var API = '/api';
+  var grid = document.getElementById('standpunten-grid');
+  var status = document.getElementById('standpunten-status');
+  var emptyMsg = document.getElementById('standpunten-empty');
+  var searchInput = document.getElementById('standpunten-zoek');
+  var categoriesWrap = document.getElementById('standpunten-categories');
+
+  var statusesWrap = document.getElementById('standpunten-statuses');
+
+  var allStandpunten = [];
+  var activeCategory = 'alle';
+  var activeStatus = 'alle';
+
+  var statusConfig = {
+    concept:        { label: 'Concept',        cssClass: 'badge--concept' },
+    programma:      { label: 'In programma',   cssClass: 'badge--programma' },
+    gewijzigd:      { label: 'Gewijzigd',      cssClass: 'badge--gewijzigd' },
+    gerectificeerd: { label: 'Gerectificeerd', cssClass: 'badge--gerectificeerd' },
+    ingetrokken:    { label: 'Ingetrokken',    cssClass: 'badge--ingetrokken' }
+  };
+
+  function loadCategories() {
+    fetch(API + '/standpunten/categorieen')
+      .then(function (res) { return res.json(); })
+      .then(function (cats) {
+        var list = Array.isArray(cats) ? cats : (cats.categorieen || []);
+        list.forEach(function (cat) {
+          var btn = document.createElement('button');
+          btn.className = 'cat-btn';
+          btn.setAttribute('data-category', cat);
+          btn.textContent = cat;
+          categoriesWrap.appendChild(btn);
+        });
+      })
+      .catch(function () {});
+  }
+
+  function loadStandpunten() {
+    fetch(API + '/standpunten')
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        allStandpunten = Array.isArray(data) ? data : (data.standpunten || []);
+        renderGrid();
+      })
+      .catch(function () {
+        status.textContent = 'Kan standpunten niet laden. Probeer het later opnieuw.';
+      });
+  }
+
+  function renderGrid() {
+    var query = searchInput.value.trim().toLowerCase();
+    var filtered = allStandpunten.filter(function (s) {
+      var matchCat = activeCategory === 'alle' || s.categorie === activeCategory;
+      var matchStatus = activeStatus === 'alle' || s.status === activeStatus;
+      var matchQuery = !query ||
+        s.titel.toLowerCase().indexOf(query) !== -1 ||
+        (s.samenvatting && s.samenvatting.toLowerCase().indexOf(query) !== -1) ||
+        (s.inhoud && s.inhoud.toLowerCase().indexOf(query) !== -1);
+      return matchCat && matchStatus && matchQuery;
+    });
+
+    if (!allStandpunten.length) return;
+
+    if (!filtered.length) {
+      grid.innerHTML = '';
+      emptyMsg.hidden = false;
+      return;
+    }
+
+    emptyMsg.hidden = true;
+    grid.innerHTML = filtered.map(function (s) {
+      var st = s.status || 'programma';
+      var cfg = statusConfig[st] || statusConfig.programma;
+      var isIngetrokken = st === 'ingetrokken';
+      var isRectificeerd = st === 'gerectificeerd';
+      var isGewijzigd = st === 'gewijzigd';
+
+      var cardClass = 'standpunt-card' + (isIngetrokken ? ' standpunt-card--ingetrokken' : '');
+      var titelHtml = isIngetrokken
+        ? '<h3><s>' + escapeHtml(s.titel) + '</s></h3>'
+        : '<h3>' + escapeHtml(s.titel) + '</h3>';
+
+      var extraContent = '';
+      if (isIngetrokken && s.intrekking_reden) {
+        extraContent += '<div class="standpunt-intrekking">' +
+          '<strong>Reden van intrekking</strong>' +
+          '<p>' + escapeHtml(s.intrekking_reden) + '</p>' +
+        '</div>';
+      }
+      if (isRectificeerd && s.rectificatie_tekst) {
+        extraContent += '<div class="standpunt-rectificatie">' +
+          '<strong>Rectificatie</strong>' +
+          '<p>' + escapeHtml(s.rectificatie_tekst) + '</p>' +
+        '</div>';
+      }
+
+      return '<div class="' + cardClass + '" data-slug="' + escapeAttr(s.slug) + '">' +
+        '<div class="standpunt-header">' +
+          '<div class="standpunt-badges">' +
+            '<span class="badge badge--standpunt">' + escapeHtml(s.categorie) + '</span>' +
+            '<span class="badge ' + cfg.cssClass + '">' + escapeHtml(cfg.label) + '</span>' +
+          '</div>' +
+          titelHtml +
+          '<p>' + escapeHtml(s.samenvatting || '') + '</p>' +
+          (isGewijzigd ? '<span class="standpunt-gewijzigd-hint"><i class="lucide lucide-arrow-down-circle" aria-hidden="true"></i> Bekijk de wijzigingsgeschiedenis voor de vorige versie</span>' : '') +
+          extraContent +
+          '<button class="standpunt-toggle" aria-expanded="false">' +
+            '<i class="lucide lucide-chevron-down" aria-hidden="true"></i> Lees meer' +
+          '</button>' +
+        '</div>' +
+        '<div class="standpunt-body" hidden>' +
+          '<div class="standpunt-inhoud">' + formatInhoud(s.inhoud || s.samenvatting || '') + '</div>' +
+          '<button class="standpunt-historie-btn" data-slug="' + escapeAttr(s.slug) + '">' +
+            '<i class="lucide lucide-history" aria-hidden="true"></i> Wijzigingsgeschiedenis' +
+          '</button>' +
+          '<div class="standpunt-historie" data-slug="' + escapeAttr(s.slug) + '" hidden></div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function formatInhoud(text) {
+    return text.split(/\n\n+/).map(function (p) {
+      return '<p>' + escapeHtml(p.trim()) + '</p>';
+    }).join('');
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function escapeAttr(str) {
+    return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+  }
+
+  function loadHistorie(slug, container) {
+    container.innerHTML = '<p class="historie-loading">Geschiedenis laden...</p>';
+    container.hidden = false;
+
+    fetch(API + '/standpunten/' + encodeURIComponent(slug) + '/historie')
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        var items = Array.isArray(data) ? data : (data.historie || []);
+        if (!items.length) {
+          container.innerHTML = '<p class="historie-empty">Geen eerdere versies.</p>';
+          return;
+        }
+        container.innerHTML = '<div class="historie-list">' +
+          items.map(function (h) {
+            return '<div class="historie-item">' +
+              '<div class="historie-meta">' +
+                '<span class="historie-date">' + escapeHtml(h.datum || '') + '</span>' +
+                '<span class="historie-versie">v' + escapeHtml(String(h.versie || '')) + '</span>' +
+              '</div>' +
+              '<div class="historie-reden">' + escapeHtml(h.wijziging_reden || h.reden || '') + '</div>' +
+            '</div>';
+          }).join('') +
+        '</div>';
+      })
+      .catch(function () {
+        container.innerHTML = '<p class="historie-empty">Kan geschiedenis niet laden.</p>';
+      });
+  }
+
+  // Event: category filter
+  categoriesWrap.addEventListener('click', function (e) {
+    var btn = e.target.closest('.cat-btn');
+    if (!btn) return;
+    categoriesWrap.querySelectorAll('.cat-btn').forEach(function (b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    activeCategory = btn.getAttribute('data-category');
+    renderGrid();
+  });
+
+  // Event: status filter
+  statusesWrap.addEventListener('click', function (e) {
+    var btn = e.target.closest('.status-btn');
+    if (!btn) return;
+    statusesWrap.querySelectorAll('.status-btn').forEach(function (b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    activeStatus = btn.getAttribute('data-status');
+    renderGrid();
+  });
+
+  // Event: search
+  var searchTimer;
+  searchInput.addEventListener('input', function () {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(renderGrid, 200);
+  });
+
+  // Event: accordion toggle + historie
+  grid.addEventListener('click', function (e) {
+    var toggleBtn = e.target.closest('.standpunt-toggle');
+    if (toggleBtn) {
+      var card = toggleBtn.closest('.standpunt-card');
+      var body = card.querySelector('.standpunt-body');
+      var expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+      toggleBtn.setAttribute('aria-expanded', String(!expanded));
+      body.hidden = expanded;
+      toggleBtn.innerHTML = expanded
+        ? '<i class="lucide lucide-chevron-down" aria-hidden="true"></i> Lees meer'
+        : '<i class="lucide lucide-chevron-up" aria-hidden="true"></i> Sluiten';
+      return;
+    }
+
+    var histBtn = e.target.closest('.standpunt-historie-btn');
+    if (histBtn) {
+      var slug = histBtn.getAttribute('data-slug');
+      var container = histBtn.parentNode.querySelector('.standpunt-historie[data-slug="' + slug + '"]');
+      if (container.hidden) {
+        loadHistorie(slug, container);
+      } else {
+        container.hidden = true;
+      }
+    }
+  });
+
+  loadCategories();
+  loadStandpunten();
+})();
+</script>
+</body>
+</html>
