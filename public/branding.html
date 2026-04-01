@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DLP — Branding Guide</title>
+<meta name="theme-color" content="#FAFAF8">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  .guide { padding: 6rem 2rem 4rem; max-width: 960px; margin: 0 auto; }
+  .guide-hero { margin-bottom: 4rem; }
+  .guide-hero h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; letter-spacing: -0.03em; margin-bottom: 0.5rem; }
+  .guide-hero p { font-size: 1.1rem; color: var(--text-secondary); max-width: 540px; line-height: 1.7; }
+
+  .guide-section { margin-bottom: 4rem; }
+  .guide-section h2 {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--accent-label);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .guide-section h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .guide-section > p { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.65; margin-bottom: 1.5rem; }
+
+  /* Color swatches */
+  .color-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .color-group-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.75rem; margin-top: 1.5rem; }
+  .color-group-title:first-child { margin-top: 0; }
+  .swatch {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .swatch-color {
+    height: 100px;
+    display: flex;
+    align-items: flex-end;
+    padding: 0.75rem;
+  }
+  .swatch-info { padding: 0.75rem; background: var(--white); }
+  .swatch-name { font-size: 0.82rem; font-weight: 600; margin-bottom: 0.15rem; }
+  .swatch-hex { font-family: var(--mono); font-size: 0.75rem; color: var(--text-muted); }
+  .swatch-var { font-family: var(--mono); font-size: 0.7rem; color: var(--text-muted); display: block; margin-top: 0.1rem; }
+
+  /* Typography specimens */
+  .type-specimen { margin-bottom: 2rem; padding: 2rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--white); }
+  .type-specimen .label { font-family: var(--mono); font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.75rem; }
+  .type-sample { margin-bottom: 0.25rem; }
+  .type-meta { font-family: var(--mono); font-size: 0.72rem; color: var(--text-muted); margin-top: 0.5rem; }
+
+  /* Logo specimens */
+  .logo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; }
+  .logo-specimen {
+    padding: 2.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .logo-specimen.on-light { background: var(--white); }
+  .logo-specimen.on-dark { background: var(--text); }
+  .logo-specimen.on-accent { background: var(--accent); }
+  .logo-specimen .nav-logo { font-size: 1.3rem; }
+  .logo-specimen.on-dark .nav-logo { color: var(--white); }
+
+  /* Component specimens */
+  .component-row { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin-bottom: 1.5rem; }
+  .component-card {
+    padding: 2rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--white);
+    margin-bottom: 1.5rem;
+  }
+  .component-card .label { font-family: var(--mono); font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1rem; }
+
+  /* Spacing specimens */
+  .spacing-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; }
+  .spacing-bar { background: var(--accent); opacity: 0.4; height: 24px; border-radius: 4px; }
+  .spacing-label { font-family: var(--mono); font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; min-width: 140px; }
+
+  /* Tone section */
+  .tone-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+  .tone-card {
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    background: var(--white);
+  }
+  .tone-card .tone-icon { font-size: 1.8rem; margin-bottom: 0.75rem; display: block; }
+  .tone-card h4 { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.25rem; }
+  .tone-card p { font-size: 0.8rem; color: var(--text-secondary); }
+
+  /* Do/Don't */
+  .do-dont { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .do-card, .dont-card {
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+  }
+  .do-card { background: #F0FAF0; border-color: #C6E6C6; }
+  .dont-card { background: var(--danger-light); border-color: #F0C0C0; }
+  .do-card h4, .dont-card h4 { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.75rem; }
+  .do-card h4 { color: #2D7D2D; }
+  .dont-card h4 { color: var(--danger); }
+  .do-card li, .dont-card li { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.4rem; list-style: none; padding-left: 1.2rem; position: relative; }
+  .do-card li::before { content: "+"; position: absolute; left: 0; font-weight: 700; color: #2D7D2D; }
+  .dont-card li::before { content: "—"; position: absolute; left: 0; font-weight: 700; color: var(--danger); }
+
+  @media (max-width: 768px) {
+    .guide { padding: 5rem 1.2rem 3rem; }
+    .do-dont { grid-template-columns: 1fr; }
+    .logo-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav aria-label="Hoofdnavigatie">
+  <a href="/" class="nav-logo"><span class="mark">DLP</span> De Logische Partij</a>
+  <button class="nav-toggle" aria-label="Menu openen" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="#kleuren">Kleuren</a>
+    <a href="#typografie">Typografie</a>
+    <a href="#componenten">Componenten</a>
+  </div>
+</nav>
+
+<div class="guide">
+  <div class="guide-hero">
+    <h1>Branding Guide</h1>
+    <p>De visuele identiteit van De Logische Partij. Fris, rationeel, en modern. Deze guide definieert de design tokens, typografie, kleuren en componenten die samen de DLP-brand vormen.</p>
+  </div>
+
+  <!-- TONE OF VOICE -->
+  <div class="guide-section">
+    <h2>Visuele identiteit</h2>
+    <p>DLP's visuele taal is gebouwd op vier pijlers die de kernwaarden van de partij weerspiegelen. De brand voelt niet aan als een traditionele politieke partij, maar als een tech-forward beweging die transparantie en rationaliteit uitstraalt.</p>
+    <div class="tone-grid">
+      <div class="tone-card">
+        <span class="tone-icon" aria-hidden="true">&#9671;</span>
+        <h4>Fris</h4>
+        <p>Licht, warm off-white. Geen zware kleuren of drukke patronen.</p>
+      </div>
+      <div class="tone-card">
+        <span class="tone-icon" aria-hidden="true">&#9651;</span>
+        <h4>Rationeel</h4>
+        <p>Monospace accenten, data-driven esthetiek, editorial grids.</p>
+      </div>
+      <div class="tone-card">
+        <span class="tone-icon" aria-hidden="true">&#9675;</span>
+        <h4>Modern</h4>
+        <p>Clean typografie, subtiele animaties, glassmorphism nav.</p>
+      </div>
+      <div class="tone-card">
+        <span class="tone-icon" aria-hidden="true">&#9633;</span>
+        <h4>Toegankelijk</h4>
+        <p>WCAG AA compliant, focus states, reduced motion support.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- COLORS -->
+  <div class="guide-section" id="kleuren">
+    <h2>Kleurenpalet</h2>
+
+    <div class="color-group-title">Primaire kleuren</div>
+    <div class="color-grid">
+      <div class="swatch">
+        <div class="swatch-color" style="background: #1A1A1A; color: #fff;">
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">Text / Primary</div>
+          <div class="swatch-hex">#1A1A1A</div>
+          <span class="swatch-var">--text</span>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background: #E8B800;">
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">Accent Gold</div>
+          <div class="swatch-hex">#E8B800</div>
+          <span class="swatch-var">--accent</span>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background: #D4A800;">
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">Accent Hover</div>
+          <div class="swatch-hex">#D4A800</div>
+          <span class="swatch-var">--accent-hover</span>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background: #A68600;">
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">Accent Label</div>
+          <div class="swatch-hex">#A68600</div>
+          <span class="swatch-var">--accent-label</span>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background: #FFF8DC;">
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">Accent Light</div>
+          <div class="swatch-hex">#FFF8DC</div>
+          <span class="swatch-var">--accent-light</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="color-group-title">Neutrals</div>
+    <div class="color-grid">
+      <div class="swatch">
+        <div class="swatch-color" style="background: #FAFAF8;">
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">Background</div>
+          <div class="swatch-hex">#FAFAF8</div>
+          <span class="swatch-var">--bg</span>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background: #FFFFFF;">
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">White</div>
+          <div class="swatch-hex">#FFFFFF</div>
+          <span class="swatch-var">--white</span>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background: #F2F1EE;">
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">Surface</div>
+          <div class="swatch-hex">#F2F1EE</div>
+          <span class="swatch-var">--surface</span>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background: #E5E4E0;">
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">Border</div>
+          <div class="swatch-hex">#E5E4E0</div>
+          <span class="swatch-var">--border</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="color-group-title">Tekst</div>
+    <div class="color-grid">
+      <div class="swatch">
+        <div class="swatch-color" style="background: #1A1A1A; color: #fff;">
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">Text Primary</div>
+          <div class="swatch-hex">#1A1A1A</div>
+          <span class="swatch-var">--text</span>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background: #5C5C5C; color: #fff;">
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">Text Secondary</div>
+          <div class="swatch-hex">#5C5C5C</div>
+          <span class="swatch-var">--text-secondary</span>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background: #757575; color: #fff;">
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">Text Muted</div>
+          <div class="swatch-hex">#757575</div>
+          <span class="swatch-var">--text-muted</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="color-group-title">Semantisch</div>
+    <div class="color-grid">
+      <div class="swatch">
+        <div class="swatch-color" style="background: #CC4444; color: #fff;">
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">Danger</div>
+          <div class="swatch-hex">#CC4444</div>
+          <span class="swatch-var">--danger</span>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background: #FFF0F0;">
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">Danger Light</div>
+          <div class="swatch-hex">#FFF0F0</div>
+          <span class="swatch-var">--danger-light</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TYPOGRAPHY -->
+  <div class="guide-section" id="typografie">
+    <h2>Typografie</h2>
+    <p>DLP gebruikt twee fonts uit de DM-familie. DM Sans als primair font voor lopende tekst en UI, DM Mono voor labels, nummers en technische accenten. De combinatie geeft een modern maar rationeel karakter.</p>
+
+    <div class="type-specimen">
+      <div class="label">Primair &mdash; DM Sans</div>
+      <div class="type-sample" style="font-size: 2.5rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1;">Het kan logischer.</div>
+      <div class="type-sample" style="font-size: 1.15rem; font-weight: 400; color: var(--text-secondary); line-height: 1.7; margin-top: 0.75rem;">Nederland verdient beleid gebaseerd op rede, transparantie en technologie.</div>
+      <div class="type-meta">DM Sans &middot; Gewichten: 300, 400, 500, 600, 700 &middot; Fallback: system-ui, sans-serif</div>
+    </div>
+
+    <div class="type-specimen">
+      <div class="label">Secundair &mdash; DM Mono</div>
+      <div class="type-sample" style="font-family: var(--mono); font-size: 1.1rem; font-weight: 500;">De Logische Partij — DLP</div>
+      <div class="type-sample" style="font-family: var(--mono); font-size: 0.72rem; color: var(--accent-label); letter-spacing: 0.15em; text-transform: uppercase; margin-top: 0.75rem;">Section label voorbeeld</div>
+      <div class="type-meta">DM Mono &middot; Gewichten: 400, 500 &middot; Gebruik: labels, nummers, meta-tekst, nav-logo</div>
+    </div>
+
+    <div class="type-specimen">
+      <div class="label">Type scale</div>
+      <div style="margin-bottom: 1rem;">
+        <div style="font-size: clamp(2.8rem, 7vw, 4.5rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1;">Hero H1</div>
+        <div class="type-meta">clamp(2.8rem, 7vw, 4.5rem) &middot; 700 &middot; -0.03em tracking</div>
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <div style="font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1.15;">Section Title</div>
+        <div class="type-meta">clamp(1.8rem, 4vw, 2.5rem) &middot; 700 &middot; -0.02em tracking</div>
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <div style="font-size: clamp(1.3rem, 3.5vw, 1.8rem); font-weight: 400; line-height: 1.5;">Blockquote / Manifesto</div>
+        <div class="type-meta">clamp(1.3rem, 3.5vw, 1.8rem) &middot; 400 &middot; -0.01em tracking</div>
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <div style="font-size: 1.05rem; color: var(--text-secondary); line-height: 1.65;">Body / Section description</div>
+        <div class="type-meta">1.05rem &middot; 400 &middot; line-height 1.65</div>
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <div style="font-size: 0.95rem; font-weight: 600;">Card title / Button text</div>
+        <div class="type-meta">0.95rem &middot; 600</div>
+      </div>
+      <div>
+        <div style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.55;">Card body / Small text</div>
+        <div class="type-meta">0.88rem &middot; 400 &middot; line-height 1.55</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGO -->
+  <div class="guide-section">
+    <h2>Logo / DLP Mark</h2>
+    <p>Het DLP-logo is een combinatie van het gouden DLP-mark (badge) en de naam "De Logische Partij" in DM Mono. Het mark fungeert als een visueel ankerpunt dat op zichzelf kan staan als compact logo-element.</p>
+
+    <div class="logo-grid">
+      <div class="logo-specimen on-light">
+        <a href="/" class="nav-logo" style="pointer-events: none;"><span class="mark">DLP</span> De Logische Partij</a>
+      </div>
+      <div class="logo-specimen on-dark">
+        <a href="/" class="nav-logo" style="pointer-events: none;"><span class="mark">DLP</span> De Logische Partij</a>
+      </div>
+      <div class="logo-specimen on-accent">
+        <a href="/" class="nav-logo" style="pointer-events: none;"><span class="mark" style="background: var(--text); color: var(--white);">DLP</span> De Logische Partij</a>
+      </div>
+      <div class="logo-specimen on-light">
+        <a href="/" class="nav-logo" style="pointer-events: none;"><span class="mark">DLP</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPONENTS -->
+  <div class="guide-section" id="componenten">
+    <h2>UI Componenten</h2>
+
+    <div class="component-card">
+      <div class="label">Buttons</div>
+      <div class="component-row">
+        <a href="#" class="btn-primary" style="pointer-events: none;">Primary Button</a>
+        <a href="#" class="btn-outline" style="pointer-events: none;">Outline Button</a>
+        <a href="#" class="nav-cta" style="pointer-events: none; text-decoration: none; display: inline-block; padding: 0.5rem 1.2rem; font-size: 0.85rem; font-weight: 600; border-radius: 6px; background: var(--text); color: var(--white);">Nav CTA</a>
+      </div>
+      <div class="type-meta">
+        Primary: dark bg, white text, 8px radius, translateY(-1px) + shadow on hover<br>
+        Outline: transparent bg, 1.5px border, border darkens on hover<br>
+        Nav CTA: compact variant of primary, 6px radius
+      </div>
+    </div>
+
+    <div class="component-card">
+      <div class="label">Cards</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <div class="vision-card">
+          <span class="vision-icon" aria-hidden="true">&#9670;</span>
+          <h3>Vision Card</h3>
+          <p>Bordered card met accent hover. Lift + glow effect.</p>
+        </div>
+        <div style="background: var(--bg); padding: 2rem; border: 1px solid var(--border); border-radius: var(--radius-lg); position: relative;">
+          <div style="font-family: var(--mono); font-size: 2rem; font-weight: 700; color: var(--accent); opacity: 0.2; position: absolute; top: 0.8rem; right: 1.2rem;">01</div>
+          <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.4rem;">Point Card</h3>
+          <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.55;">Grid-gap card met grote nummerindicator.</p>
+        </div>
+        <div style="background: var(--white); padding: 2rem; border: 1px solid var(--border); border-radius: var(--radius-lg);">
+          <div style="font-family: var(--mono); font-size: 0.7rem; color: var(--danger); letter-spacing: 0.08em; margin-bottom: 0.6rem; font-weight: 500;">01</div>
+          <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.4rem;">Problem Card</h3>
+          <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.55;">Hover naar danger-light achtergrond.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="component-card">
+      <div class="label">Form elements</div>
+      <div style="background: var(--text); padding: 2rem; border-radius: var(--radius-md); max-width: 400px;">
+        <div style="display: flex; gap: 0.5rem;">
+          <input type="email" placeholder="jouw@email.nl" style="flex: 1; padding: 0.85rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: var(--white); font-family: var(--font); font-size: 0.9rem; border-radius: var(--radius-md); outline: none;">
+          <button type="button" style="padding: 0.85rem 1.5rem; background: var(--accent); color: var(--text); border: none; font-family: var(--font); font-weight: 700; font-size: 0.9rem; border-radius: var(--radius-md); cursor: pointer; white-space: nowrap;">Aanmelden</button>
+        </div>
+      </div>
+      <div class="type-meta" style="margin-top: 0.75rem;">Dark-bg input met subtiele border. Focus state: accent border + lichte bg verhoging.</div>
+    </div>
+
+    <div class="component-card">
+      <div class="label">Section labels</div>
+      <div>
+        <div class="section-label">Section label</div>
+        <div class="section-title" style="margin-bottom: 0.5rem;">Section Title</div>
+        <div class="section-desc" style="margin-bottom: 0;">Beschrijvende tekst onder de section title, max 560px breed.</div>
+      </div>
+      <div class="type-meta" style="margin-top: 1rem;">Label: DM Mono, 0.72rem, uppercase, accent-label kleur (#A68600), 0.15em letter-spacing</div>
+    </div>
+  </div>
+
+  <!-- SPACING -->
+  <div class="guide-section">
+    <h2>Spacing systeem</h2>
+    <p>DLP gebruikt CSS custom properties voor consistente spacing. De schaal loopt van xs (0.25rem / 4px) tot 2xl (5rem / 80px).</p>
+
+    <div class="component-card">
+      <div class="label">Spacing tokens</div>
+      <div class="spacing-row">
+        <div class="spacing-label">--space-xs: 0.25rem</div>
+        <div class="spacing-bar" style="width: 4px;"></div>
+      </div>
+      <div class="spacing-row">
+        <div class="spacing-label">--space-sm: 0.5rem</div>
+        <div class="spacing-bar" style="width: 8px;"></div>
+      </div>
+      <div class="spacing-row">
+        <div class="spacing-label">--space-md: 1rem</div>
+        <div class="spacing-bar" style="width: 16px;"></div>
+      </div>
+      <div class="spacing-row">
+        <div class="spacing-label">--space-lg: 2rem</div>
+        <div class="spacing-bar" style="width: 32px;"></div>
+      </div>
+      <div class="spacing-row">
+        <div class="spacing-label">--space-xl: 3rem</div>
+        <div class="spacing-bar" style="width: 48px;"></div>
+      </div>
+      <div class="spacing-row">
+        <div class="spacing-label">--space-2xl: 5rem</div>
+        <div class="spacing-bar" style="width: 80px;"></div>
+      </div>
+    </div>
+
+    <div class="component-card">
+      <div class="label">Border radius tokens</div>
+      <div class="component-row">
+        <div style="width: 60px; height: 60px; background: var(--accent-light); border: 1px solid var(--accent); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center;">
+          <span style="font-family: var(--mono); font-size: 0.65rem;">6px</span>
+        </div>
+        <div style="width: 60px; height: 60px; background: var(--accent-light); border: 1px solid var(--accent); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
+          <span style="font-family: var(--mono); font-size: 0.65rem;">8px</span>
+        </div>
+        <div style="width: 60px; height: 60px; background: var(--accent-light); border: 1px solid var(--accent); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
+          <span style="font-family: var(--mono); font-size: 0.65rem;">12px</span>
+        </div>
+      </div>
+      <div class="type-meta">--radius-sm: 6px (nav CTA, tags) &middot; --radius-md: 8px (buttons, inputs) &middot; --radius-lg: 12px (cards, grids)</div>
+    </div>
+  </div>
+
+  <!-- DO / DON'T -->
+  <div class="guide-section">
+    <h2>Richtlijnen</h2>
+    <div class="do-dont">
+      <div class="do-card">
+        <h4>Wel</h4>
+        <ul>
+          <li>Gebruik het warme off-white als primaire achtergrond</li>
+          <li>Gebruik accent-goud spaarzaam als highlight</li>
+          <li>Houd typografie clean en licht</li>
+          <li>Gebruik monospace voor labels en meta-tekst</li>
+          <li>Laat witruimte ademen</li>
+          <li>Zorg voor WCAG AA contrast op alle tekst</li>
+          <li>Geef alle interactieve elementen focus states</li>
+        </ul>
+      </div>
+      <div class="dont-card">
+        <h4>Niet</h4>
+        <ul>
+          <li>Gebruik geen felle kleuren of gradients</li>
+          <li>Overlaad pagina's niet met animaties</li>
+          <li>Gebruik geen decoratieve fonts</li>
+          <li>Gebruik het DLP-mark niet op te kleine schaal</li>
+          <li>Maak de achtergrond niet puur wit (#FFF)</li>
+          <li>Gebruik geen politieke symboliek of vlaggen</li>
+          <li>Vergeet reduced-motion support niet</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>&copy; 2026 De Logische Partij (DLP) — Branding Guide</span>
+  <span><a href="/">Terug naar home</a></span>
+</footer>
+
+<script src="/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+.DS_Store
+node_modules/
+.env
+*.log
+server/api/data/
+.ssh/
+deploy.sh
+legal/
+marketing/
