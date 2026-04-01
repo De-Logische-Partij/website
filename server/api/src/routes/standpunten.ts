@@ -84,6 +84,10 @@ function formatStandpunt(row: Standpunt) {
     juridisch: row.juridisch,
     beperkingen: row.beperkingen,
     bronnen: parseJsonArray(row.bronnen),
+    kosten_mld: row.kosten_mld,
+    opbrengst_mld: row.opbrengst_mld,
+    kosten_toelichting: row.kosten_toelichting,
+    opbrengst_toelichting: row.opbrengst_toelichting,
     versie: row.versie,
     created_at: row.created_at,
     updated_at: row.updated_at,
@@ -212,7 +216,7 @@ adminStandpunten.use("/*", requireApiKey);
 
 adminStandpunten.post("/", async (c) => {
   const body = await c.req.json();
-  const { slug, titel, categorie, samenvatting, inhoud, kernwaarden, cijfers, maatregelen, juridisch, beperkingen, bronnen } = body;
+  const { slug, titel, categorie, samenvatting, inhoud, kernwaarden, cijfers, maatregelen, juridisch, beperkingen, bronnen, kosten_mld, opbrengst_mld, kosten_toelichting, opbrengst_toelichting } = body;
 
   if (!slug || !titel || !categorie || !samenvatting || !inhoud) {
     return c.json(
@@ -236,10 +240,10 @@ adminStandpunten.post("/", async (c) => {
 
   const result = db
     .query(
-      `INSERT INTO standpunten (slug, titel, categorie, samenvatting, inhoud, kernwaarden, cijfers, maatregelen, juridisch, beperkingen, bronnen)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO standpunten (slug, titel, categorie, samenvatting, inhoud, kernwaarden, cijfers, maatregelen, juridisch, beperkingen, bronnen, kosten_mld, opbrengst_mld, kosten_toelichting, opbrengst_toelichting)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
-    .run(slug, titel, categorie, samenvatting, inhoud, kernwaardenJson, cijfersJson, maatregelenJson, juridisch ?? null, beperkingen ?? null, bronnenJson);
+    .run(slug, titel, categorie, samenvatting, inhoud, kernwaardenJson, cijfersJson, maatregelenJson, juridisch ?? null, beperkingen ?? null, bronnenJson, kosten_mld ?? null, opbrengst_mld ?? null, kosten_toelichting ?? null, opbrengst_toelichting ?? null);
 
   const created = db
     .query("SELECT * FROM standpunten WHERE id = ?")
@@ -251,7 +255,7 @@ adminStandpunten.post("/", async (c) => {
 adminStandpunten.put("/:slug", async (c) => {
   const slug = c.req.param("slug");
   const body = await c.req.json();
-  const { titel, categorie, samenvatting, inhoud, kernwaarden, cijfers, maatregelen, juridisch, beperkingen, bronnen, gewijzigd_door, wijziging_reden } = body;
+  const { titel, categorie, samenvatting, inhoud, kernwaarden, cijfers, maatregelen, juridisch, beperkingen, bronnen, kosten_mld, opbrengst_mld, kosten_toelichting, opbrengst_toelichting, gewijzigd_door, wijziging_reden } = body;
 
   const existing = db
     .query("SELECT * FROM standpunten WHERE slug = ?")
@@ -285,6 +289,10 @@ adminStandpunten.put("/:slug", async (c) => {
   const newJuridisch = juridisch !== undefined ? juridisch : existing.juridisch;
   const newBeperkingen = beperkingen !== undefined ? beperkingen : existing.beperkingen;
   const newBronnen = bronnen !== undefined ? JSON.stringify(bronnen) : existing.bronnen;
+  const newKostenMld = kosten_mld !== undefined ? kosten_mld : existing.kosten_mld;
+  const newOpbrengstMld = opbrengst_mld !== undefined ? opbrengst_mld : existing.opbrengst_mld;
+  const newKostenToelichting = kosten_toelichting !== undefined ? kosten_toelichting : existing.kosten_toelichting;
+  const newOpbrengstToelichting = opbrengst_toelichting !== undefined ? opbrengst_toelichting : existing.opbrengst_toelichting;
   const newVersie = existing.versie + 1;
 
   const newStatus = existing.status === "programma" || existing.status === "gewijzigd"
@@ -293,9 +301,9 @@ adminStandpunten.put("/:slug", async (c) => {
 
   db.query(
     `UPDATE standpunten
-     SET titel = ?, categorie = ?, samenvatting = ?, inhoud = ?, kernwaarden = ?, cijfers = ?, maatregelen = ?, juridisch = ?, beperkingen = ?, bronnen = ?, versie = ?, status = ?, updated_at = datetime('now')
+     SET titel = ?, categorie = ?, samenvatting = ?, inhoud = ?, kernwaarden = ?, cijfers = ?, maatregelen = ?, juridisch = ?, beperkingen = ?, bronnen = ?, kosten_mld = ?, opbrengst_mld = ?, kosten_toelichting = ?, opbrengst_toelichting = ?, versie = ?, status = ?, updated_at = datetime('now')
      WHERE slug = ?`
-  ).run(newTitel, newCategorie, newSamenvatting, newInhoud, newKernwaarden, newCijfers, newMaatregelen, newJuridisch, newBeperkingen, newBronnen, newVersie, newStatus, slug);
+  ).run(newTitel, newCategorie, newSamenvatting, newInhoud, newKernwaarden, newCijfers, newMaatregelen, newJuridisch, newBeperkingen, newBronnen, newKostenMld, newOpbrengstMld, newKostenToelichting, newOpbrengstToelichting, newVersie, newStatus, slug);
 
   const updated = db
     .query("SELECT * FROM standpunten WHERE slug = ?")

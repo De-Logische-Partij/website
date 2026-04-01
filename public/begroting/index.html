@@ -142,6 +142,62 @@
     'Nationale Schuld': 'Rente en aflossing op de staatsleningen waarmee het begrotingstekort wordt gefinancierd.'
   };
 
+  var artikelUitleg = {
+    'Oudedagsvoorziening': 'AOW-uitkeringen aan gepensioneerden.',
+    'Arbeidsongeschiktheid': 'WIA, WAO en Wajong uitkeringen.',
+    'Tegemoetkoming ouders': 'Kinderbijslag en kindgebonden budget.',
+    'Bijstand, Participatiewet en Toeslagenwet': 'Bijstandsuitkeringen en re-integratie.',
+    'Ziekte en verlofregelingen': 'Ziektewet en zwangerschapsverlof.',
+    'Kinderopvang': 'Kinderopvangtoeslag en kwaliteit kinderopvang.',
+    'Werkloosheid': 'WW-uitkeringen en activerend arbeidsmarktbeleid.',
+    'Functionele uitgaven van de Koning': 'Kosten voor het functioneren van het koningschap.',
+    'Grondwettelijke uitkering aan de leden van het Koninklijk Huis': 'Wettelijk vastgestelde uitkeringen aan de Koning en familieleden.',
+    'Doorbelaste uitgaven van andere begrotingen': 'Kosten die door andere ministeries worden doorbelast.',
+    'Curatieve zorg': 'Ziekenhuiszorg, huisartsen en medisch specialisten.',
+    'Langdurige zorg': 'Verpleeghuizen, thuiszorg en gehandicaptenzorg.',
+    'Maatschappelijke ondersteuning': 'Jeugdzorg, Wmo en sociaal domein.',
+    'Primair onderwijs': 'Basisscholen en speciaal basisonderwijs.',
+    'Voortgezet onderwijs': 'Middelbare scholen.',
+    'Beroepsonderwijs en volwasseneneducatie': 'MBO en volwassenenonderwijs.',
+    'Hoger beroepsonderwijs': 'HBO-instellingen.',
+    'Wetenschappelijk onderwijs': 'Universiteiten.',
+    'Studiefinanciering': 'Studiebeurzen en -leningen.',
+    'Investeringen in waterveiligheid': 'Dijken, dammen en waterbeheer.',
+    'Wegen en verkeersveiligheid': 'Aanleg en onderhoud van rijkswegen.',
+    'Spoor': 'Spoorinfrastructuur en ProRail.',
+    'Nationale politie': 'Politiekorps en opsporing.',
+    'Rechtspleging en rechtsbijstand': 'Rechtbanken en gesubsidieerde rechtsbijstand.',
+    'Sanctietoepassing': 'Gevangenissen en reclassering.',
+    'Apparaat Kerndepartement': 'Overhead en personeel van het ministerie zelf.',
+    'Nog onverdeeld': 'Reserveringen die nog aan specifieke posten worden toegewezen.',
+    'Belastingdienst': 'Inning van belastingen en toeslagen.',
+    'Rijksbijdragen': 'Bijdragen van het Rijk aan sociale fondsen.',
+    'Internationaal beleid': 'Diplomatie, internationale organisaties en ontwikkelingssamenwerking.',
+    'Migratiebeleid': 'Asielopvang, IND en terugkeerbeleid.',
+    'Veiligheid en terrorismebestrijding': 'AIVD, NCTV en nationale veiligheid.',
+    'Openbaar vervoer en spoor': 'Subsidies voor bus, tram, metro en trein.',
+    'Cultuur': 'Musea, bibliotheken, podiumkunsten en erfgoed.',
+    'Media': 'Publieke omroep en mediabeleid.',
+    'Onderzoek en wetenschapsbeleid': 'NWO, onderzoeksinstituten en wetenschapsinfrastructuur.',
+    'Caribisch Nederland': 'Bestuur en voorzieningen op Bonaire, Sint Eustatius en Saba.',
+    'Kiesraad': 'Organisatie van verkiezingen.',
+    'Wetgeving en democratie': 'Wetgevingsproces en ondersteuning van de democratische rechtsstaat.'
+  };
+
+  var artikelUitlegKeys = Object.keys(artikelUitleg);
+
+  function findArtikelUitleg(naam) {
+    if (!naam) return '';
+    if (artikelUitleg[naam]) return artikelUitleg[naam];
+    var lower = naam.toLowerCase();
+    for (var i = 0; i < artikelUitlegKeys.length; i++) {
+      if (lower.indexOf(artikelUitlegKeys[i].toLowerCase()) !== -1) {
+        return artikelUitleg[artikelUitlegKeys[i]];
+      }
+    }
+    return '';
+  }
+
   function formatBedrag(duizenden) {
     var euro = duizenden * 1000;
     var abs = Math.abs(euro);
@@ -511,9 +567,14 @@
           (sorted.length ? sorted.map(function (a) {
             var bedrag = a.totaal_duizend_euro || a.uitgaven || a.totaal || 0;
             var pct = max > 0 ? Math.max((bedrag / max) * 100, 1) : 1;
+            var artNaam = a.naam || a.artikel_naam || '';
+            var artUitleg = findArtikelUitleg(artNaam);
             return '<div class="begroting-bar-row begroting-bar-row--detail">' +
               '<div class="begroting-bar-label">' +
-                '<span class="begroting-bar-naam">' + escapeHtml(a.naam || a.artikel_naam || '') + '</span>' +
+                '<div class="begroting-bar-naam-wrap">' +
+                  '<span class="begroting-bar-naam">' + escapeHtml(artNaam) + '</span>' +
+                  (artUitleg ? '<span class="begroting-bar-uitleg">' + escapeHtml(artUitleg) + '</span>' : '') +
+                '</div>' +
                 '<span class="begroting-bar-bedrag">' + formatBedrag(bedrag) + '</span>' +
               '</div>' +
               '<div class="begroting-bar-track">' +
