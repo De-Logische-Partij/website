@@ -21,6 +21,10 @@ interface Standpunt {
   juridisch: string | null;
   beperkingen: string | null;
   bronnen: string | null;
+  kosten_mld: number | null;
+  opbrengst_mld: number | null;
+  kosten_toelichting: string | null;
+  opbrengst_toelichting: string | null;
   versie: number;
   created_at: string;
   updated_at: string;

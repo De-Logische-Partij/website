@@ -649,6 +649,7 @@ section { padding: var(--space-2xl) var(--space-lg); }
 .founder-photo img {
   width: 180px;
   height: 180px;
+  max-width: 100%;
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid var(--border);
@@ -721,6 +722,49 @@ section { padding: var(--space-2xl) var(--space-lg); }
 .donate {
   background: var(--white);
   border-top: 1px solid var(--border);
+}
+
+.donate-methods {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-lg);
+  margin-top: var(--space-lg);
+}
+
+.donate-method {
+  padding: var(--space-lg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.donate-method:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 20px rgba(232, 184, 0, 0.08);
+}
+
+.donate-method-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.donate-method-icon {
+  font-size: 1.4rem;
+  color: var(--accent);
+}
+
+.donate-method h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.donate-method-desc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-bottom: var(--space-md);
 }
 
 .donate-address {
@@ -1850,6 +1894,27 @@ footer a:hover { color: var(--text); }
   white-space: nowrap;
 }
 
+.standpunt-deel-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  margin-top: var(--space-md);
+  transition: color 0.2s;
+}
+
+.standpunt-deel-link:hover {
+  color: var(--accent-label);
+}
+
+.standpunt-deel-link i {
+  font-size: 0.85rem;
+  font-style: normal;
+}
+
 .standpunt-historie-btn {
   display: inline-flex;
   align-items: center;
@@ -2348,21 +2413,27 @@ footer a:hover { color: var(--text); }
 .kerncijfers-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 1px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
+  gap: var(--space-sm);
+  align-items: stretch;
 }
 
 .kerncijfer {
   flex: 1 1 140px;
-  background: var(--bg);
+  background: var(--surface);
   padding: var(--space-md) var(--space-lg);
   text-align: center;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 0.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.kerncijfer:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-color: var(--accent);
 }
 
 .kerncijfer-waarde {
@@ -2370,6 +2441,10 @@ footer a:hover { color: var(--text); }
   font-size: 1rem;
   font-weight: 700;
   color: var(--text);
+}
+
+.kerncijfer--accent .kerncijfer-waarde {
+  color: var(--accent-hover);
 }
 
 .kerncijfer--negatief .kerncijfer-waarde {
@@ -2396,12 +2471,14 @@ footer a:hover { color: var(--text); }
 .kerncijfers-rij-label {
   display: block;
   font-family: var(--mono);
-  font-size: 0.68rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: var(--space-xs);
+  color: var(--text);
+  margin-bottom: var(--space-sm);
+  padding-bottom: var(--space-xs);
+  border-bottom: 2px solid var(--accent);
 }
 
 .kerncijfer-sub {
@@ -2428,7 +2505,7 @@ footer a:hover { color: var(--text); }
 .kerncijfers-context {
   border-left: 3px solid var(--accent);
   background: var(--accent-subtle);
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--space-md) var(--space-lg);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   margin-top: var(--space-md);
 }
@@ -2450,8 +2527,8 @@ footer a:hover { color: var(--text); }
 .kerncijfers-event {
   display: inline-block;
   padding: 0.3rem 0.7rem;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--accent-subtle);
+  border: 1px solid rgba(232, 184, 0, 0.25);
   border-radius: 100px;
   font-size: 0.75rem;
   font-weight: 500;
@@ -2769,7 +2846,8 @@ footer a:hover { color: var(--text); }
   .trend-bars { height: 140px; gap: 2px; }
   .trend-bedrag { font-size: 0.55rem; }
   .trend-jaar { font-size: 0.62rem; }
-  .kerncijfer { flex-basis: calc(50% - 1px); padding: var(--space-sm) var(--space-md); }
+  .kerncijfers-grid { gap: var(--space-xs); }
+  .kerncijfer { flex-basis: calc(50% - var(--space-xs)); padding: var(--space-sm) var(--space-md); }
   .kerncijfer-waarde { font-size: 0.85rem; }
 
   .begroting-bar-row {

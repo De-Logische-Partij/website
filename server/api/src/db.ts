@@ -47,11 +47,19 @@ db.exec(`
     juridisch TEXT,
     beperkingen TEXT,
     bronnen TEXT,
+    kosten_mld REAL,
+    opbrengst_mld REAL,
+    kosten_toelichting TEXT,
+    opbrengst_toelichting TEXT,
     versie INTEGER DEFAULT 1,
     created_at TEXT DEFAULT (datetime('now')),
     updated_at TEXT DEFAULT (datetime('now'))
   )
 `);
+
+for (const col of ["kosten_mld", "opbrengst_mld", "kosten_toelichting", "opbrengst_toelichting"]) {
+  try { db.exec(`ALTER TABLE standpunten ADD COLUMN ${col} ${col.endsWith("_mld") ? "REAL" : "TEXT"}`); } catch {}
+}
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS standpunten_historie (
@@ -73,7 +81,7 @@ const standpuntenCount = db.query("SELECT COUNT(*) as n FROM standpunten").get()
 
 if (standpuntenCount.n === 0) {
   const insertStandpunt = db.prepare(
-    "INSERT INTO standpunten (slug, titel, categorie, samenvatting, inhoud, kernwaarden, status, cijfers, maatregelen, juridisch, beperkingen, bronnen) VALUES (?, ?, ?, ?, ?, ?, 'programma', ?, ?, ?, ?, ?)"
+    "INSERT INTO standpunten (slug, titel, categorie, samenvatting, inhoud, kernwaarden, status, cijfers, maatregelen, juridisch, beperkingen, bronnen, kosten_mld, opbrengst_mld, kosten_toelichting, opbrengst_toelichting) VALUES (?, ?, ?, ?, ?, ?, 'programma', ?, ?, ?, ?, ?, ?, ?, ?, ?)"
   );
 
   const seedStandpunten = db.transaction(() => {
@@ -88,7 +96,10 @@ if (standpuntenCount.n === 0) {
       JSON.stringify(["Afschaffing toeslagenstelsel", "Invoering hoge belastingvrije voet", "Een vlak belastingtarief voor alle inkomens", "Vereenvoudiging van de Belastingdienst"]),
       "Vlaktaks is juridisch mogelijk maar vereist ingrijpende wetswijzigingen in de Wet IB 2001 en afschaffing van de Algemene wet inkomensafhankelijke regelingen (Awir). EU-recht staat een vlaktaks toe; meerdere EU-landen hanteren dit systeem.",
       "Overgangsperiode van meerdere jaren nodig. Koopkrachteffecten moeten zorgvuldig worden doorgerekend door het CPB. De belastingvrije voet moet hoog genoeg zijn om lage inkomens te beschermen.",
-      JSON.stringify([{"titel": "CPB: Kansrijk Belastingbeleid", "url": "https://www.cpb.nl/", "datum": "2024"}, {"titel": "Belastingdienst: Toeslagen in cijfers", "url": "https://www.belastingdienst.nl/", "datum": "2024"}, {"titel": "Parlementaire ondervragingscommissie Kinderopvangtoeslag", "url": "https://www.tweedekamer.nl/", "datum": "2020"}])
+      JSON.stringify([{"titel": "CPB: Kansrijk Belastingbeleid", "url": "https://www.cpb.nl/", "datum": "2024"}, {"titel": "Belastingdienst: Toeslagen in cijfers", "url": "https://www.belastingdienst.nl/", "datum": "2024"}, {"titel": "Parlementaire ondervragingscommissie Kinderopvangtoeslag", "url": "https://www.tweedekamer.nl/", "datum": "2020"}]),
+      8, 2,
+      "Belastingderving door lager tarief: het vlaktaks-tarief leidt tot minder inkomsten uit de hogere schijven. Geschat netto-effect circa 8 miljard euro per jaar.",
+      "Besparing uitvoeringskosten toeslagenstelsel: afschaffing van het complete toeslagensysteem bespaart circa 2 miljard euro per jaar aan uitvoering, bezwaren en fouten."
     );
 
     insertStandpunt.run(
@@ -98,7 +109,8 @@ if (standpuntenCount.n === 0) {
       "Minder vergunningen, minder rapportages. Geen verplichte zzp-verzekering. De overheid faciliteert.",
       "Ondernemers besteden tot 20% van hun tijd aan compliance: vergunningen aanvragen, rapportages invullen, regels naleven die niemand begrijpt. Dit remt innovatie en maakt ondernemen onnodig zwaar, vooral voor kleine bedrijven en zzp'ers.\n\nDLP wil ondernemers bevrijden van onnodige bureaucratie. Minder vergunningen, minder rapportageverplichtingen en geen verplichte zzp-verzekering. De overheid moet een faciliterende rol aannemen in plaats van een controlerende. Wie risico neemt en waarde creëert, verdient steun, geen papierwinkel.\n\nEen ondernemer moet kunnen ondernemen. Niet vergaderen met de overheid.",
       JSON.stringify(["Vrijheid", "Autonomie"]),
-      null, null, null, null, null
+      null, null, null, null, null,
+      null, null, null, null
     );
 
     insertStandpunt.run(
@@ -108,7 +120,8 @@ if (standpuntenCount.n === 0) {
       "Vrije onderwijsvorm: thuisonderwijs, versnellen, eigen route. Het systeem past zich aan het kind aan.",
       "Het huidige onderwijssysteem stamt uit de industriele revolutie: iedereen dezelfde lesstof, hetzelfde tempo, dezelfde toetsen. Kinderen die anders denken, sneller leren of juist meer tijd nodig hebben, worden afgeremd of buitengesloten.\n\nDLP wil leerplicht vervangen door leerrecht. Ouders en kinderen krijgen de vrijheid om de onderwijsvorm te kiezen die bij hen past: regulier onderwijs, thuisonderwijs, versnellen, een eigen leerroute of een combinatie daarvan. Het systeem past zich aan het kind aan, niet andersom.\n\nDe overheid stelt kwaliteitskaders, maar schrijft niet voor hoe een kind moet leren. Talent verdient ruimte, niet een mal.",
       JSON.stringify(["Autonomie", "Vrijheid"]),
-      null, null, null, null, null
+      null, null, null, null, null,
+      null, null, null, null
     );
 
     insertStandpunt.run(
@@ -122,7 +135,10 @@ if (standpuntenCount.n === 0) {
       JSON.stringify(["Wettelijk verbod op massasurveillance", "Eigendomsrecht op persoonlijke data vastleggen in de Grondwet", "Open source-verplichting voor alle nieuwe overheidssoftware", "Oprichting van een onafhankelijke Digitale Waakhond"]),
       "Privacy is al beschermd onder artikel 10 van de Grondwet en de AVG/GDPR. Uitbreiding naar een expliciet digitaal grondrecht vereist een grondwetswijziging (twee lezingen). Open source-verplichting is mogelijk via aanbestedingsregels.",
       "Migratie van bestaande overheidssystemen naar open source is een proces van jaren. Niet alle software kan direct vervangen worden. Internationale samenwerking (Five Eyes, EU) legt beperkingen op aan het volledig verbieden van surveillance.",
-      JSON.stringify([{"titel": "Autoriteit Persoonsgegevens: Jaarverslag", "url": "https://www.autoriteitpersoonsgegevens.nl/", "datum": "2024"}, {"titel": "Rijks ICT-dashboard", "url": "https://www.rijksictdashboard.nl/", "datum": "2025"}, {"titel": "EU General Data Protection Regulation", "url": "https://gdpr.eu/", "datum": "2018"}])
+      JSON.stringify([{"titel": "Autoriteit Persoonsgegevens: Jaarverslag", "url": "https://www.autoriteitpersoonsgegevens.nl/", "datum": "2024"}, {"titel": "Rijks ICT-dashboard", "url": "https://www.rijksictdashboard.nl/", "datum": "2025"}, {"titel": "EU General Data Protection Regulation", "url": "https://gdpr.eu/", "datum": "2018"}]),
+      1.5, 2,
+      "Migratie naar open source: eenmalige en meerjarige kosten voor migratie van overheidssystemen naar open source software, inclusief training en onderhoud. Geschat op circa 1,5 miljard euro over 5 jaar.",
+      "Besparing licentiekosten en minder IT-falen: geen jaarlijkse licentiekosten meer aan grote techbedrijven, plus minder kostbare IT-projecten die mislukken. Geschat op circa 2 miljard euro besparing over 5 jaar."
     );
 
     insertStandpunt.run(
@@ -132,7 +148,8 @@ if (standpuntenCount.n === 0) {
       "Vertrouwen in de zorgprofessional. Minder indicaties, meer zorg. GGZ-wachtlijsten halveren.",
       "Zorgprofessionals besteden een groot deel van hun tijd aan administratie: indicaties, verantwoordingen, registraties en declaraties. Dit gaat ten koste van de daadwerkelijke zorg. Ondertussen lopen de wachtlijsten in de GGZ op tot onacceptabele niveaus.\n\nDLP wil het vertrouwen in de zorgprofessional herstellen. Minder indicatieverplichtingen, minder administratieve lasten en meer ruimte om te doen waar het om draait: zorgen voor mensen. De GGZ-wachtlijsten moeten gehalveerd worden door bureaucratische drempels weg te nemen en innovatieve zorgvormen mogelijk te maken.\n\nEen arts moet genezen. Niet administreren.",
       JSON.stringify(["Eenvoud", "Logica"]),
-      null, null, null, null, null
+      null, null, null, null, null,
+      null, null, null, null
     );
 
     insertStandpunt.run(
@@ -142,7 +159,8 @@ if (standpuntenCount.n === 0) {
       "Vergunningen binnen 30 dagen. Ruimte voor tiny houses en zelfbouw. Minder bezwaarprocedures.",
       "Nederland heeft een woningtekort, maar bouwen duurt eindeloos. Vergunningtrajecten slepen zich maanden of jaren voort. Bezwaarprocedures vertragen projecten die al goedgekeurd zijn. Innovatieve woonvormen zoals tiny houses en zelfbouw stuiten op rigide bestemmingsplannen.\n\nDLP wil dat bouwvergunningen binnen 30 dagen worden afgehandeld. Bezwaarprocedures worden vereenvoudigd zodat ze niet langer als vertragingstactiek kunnen worden ingezet. Er komt ruimte voor alternatieve woonvormen: tiny houses, zelfbouw, modulair bouwen en andere creatieve oplossingen voor het woningtekort.\n\nWie wil bouwen, moet kunnen bouwen, zonder jarenlang te wachten op toestemming.",
       JSON.stringify(["Eenvoud", "Vrijheid"]),
-      null, null, null, null, null
+      null, null, null, null, null,
+      null, null, null, null
     );
 
     insertStandpunt.run(
@@ -152,7 +170,8 @@ if (standpuntenCount.n === 0) {
       "Bindende referenda. AI-ondersteunde burgerparticipatie. Elke burger kan meedenken en meebeslissen.",
       "De huidige democratie is een vierjaarlijkse checkout: je stemt, en daarna heb je vier jaar lang geen directe invloed meer. Besluitvorming vindt plaats achter gesloten deuren en burgers voelen zich niet gehoord.\n\nDLP wil bindende referenda invoeren waarmee burgers direct invloed uitoefenen op belangrijke besluiten. AI-ondersteunde burgerparticipatie maakt het mogelijk om complexe wetsvoorstellen begrijpelijk samen te vatten en burgers geinformeerd mee te laten beslissen. Elke burger kan meedenken en meebeslissen, niet eens per vier jaar, maar doorlopend.\n\nDemocratie is geen eenmalige gebeurtenis. Het is een doorlopend gesprek.",
       JSON.stringify(["Logica", "Autonomie"]),
-      null, null, null, null, null
+      null, null, null, null, null,
+      null, null, null, null
     );
 
     insertStandpunt.run(
@@ -162,7 +181,8 @@ if (standpuntenCount.n === 0) {
       "De rijksbegroting als real-time, interactief dashboard waar iedere burger kan zien waar elke euro naartoe gaat.",
       "De rijksbegroting is nu een onleesbaar PDF-moeras van duizenden pagina's. Niemand leest het, niemand begrijpt het, en dat is precies hoe het systeem het wil. DLP wil daar verandering in brengen.\n\nDLP pleit voor een real-time, interactief begrotingsdashboard waar iedere burger kan zien waar elke euro naartoe gaat. Machine-leesbaar, doorzoekbaar, met AI-uitleg in begrijpelijke taal. Elke overheidstransactie traceerbaar. Geen verborgen potjes, geen boekhoudkundige trucjes.\n\nTransparantie levert Nederland jaarlijks miljarden op. Het is geen kostenpost, het is een investering.",
       JSON.stringify(["Logica", "Eenvoud", "Vrijheid"]),
-      null, null, null, null, null
+      null, null, null, null, null,
+      null, null, null, null
     );
 
     insertStandpunt.run(
@@ -172,7 +192,8 @@ if (standpuntenCount.n === 0) {
       "Legalisering en regulering. Harm reduction boven criminalisering. Volwassenen behandelen als volwassenen.",
       "Het huidige drugsbeleid is gebaseerd op moraal en angst, niet op wetenschap. Het criminaliseren van drugsgebruik leidt niet tot minder gebruik, maar wel tot meer criminaliteit, onveilige producten en overbelaste rechtbanken. Het gedoogbeleid creeert een grijs gebied waar niemand bij gebaat is.\n\nDLP pleit voor een evidence-based drugsbeleid: legalisering en regulering van drugs, met strenge kwaliteitseisen en leeftijdsgrenzen. Harm reduction staat centraal, niet straf, maar hulp. Volwassenen worden behandeld als volwassenen die zelf verantwoorde keuzes kunnen maken.\n\nDe war on drugs is mislukt. Het wordt tijd voor een logische aanpak.",
       JSON.stringify(["Logica", "Vrijheid"]),
-      null, null, null, null, null
+      null, null, null, null, null,
+      null, null, null, null
     );
 
     insertStandpunt.run(
@@ -182,7 +203,8 @@ if (standpuntenCount.n === 0) {
       "Technologieneutraal beleid. Vrij opwekken, opslaan en verhandelen. Van zon tot kern, de markt kiest.",
       "Het huidige energiebeleid pikt winnaars en verliezers: sommige technologieen worden gesubsidieerd, andere worden verboden of ontmoedigd. Dit leidt tot inefficientie, hogere energieprijzen en een rem op innovatie.\n\nDLP staat voor technologieneutraal energiebeleid. Of het nu gaat om zonne-energie, windenergie, kernenergie of een technologie die nog moet worden uitgevonden, de overheid kiest niet, de markt kiest. Burgers en bedrijven moeten vrij zijn om energie op te wekken, op te slaan en te verhandelen zonder onnodige beperkingen.\n\nEnergievrijheid betekent dat iedereen toegang heeft tot betaalbare, betrouwbare energie, ongeacht welke technologie dat levert.",
       JSON.stringify(["Vrijheid", "Autonomie"]),
-      null, null, null, null, null
+      null, null, null, null, null,
+      null, null, null, null
     );
 
     insertStandpunt.run(
@@ -192,7 +214,8 @@ if (standpuntenCount.n === 0) {
       "De digitale transformatie verdient een eigen plek aan de kabinettafel.",
       "De digitale transformatie verdient een eigen plek aan de kabinettafel. Een minister die AI, robotica, digitale infrastructuur en cyberveiligheid als kernverantwoordelijkheid heeft. Technologie is de motor van onze economie en samenleving. Het verdient een minister die daar volledig voor staat, met een eigen begroting en mandaat. Geen bijzaak bij Economische Zaken, maar topprioriteit.",
       JSON.stringify(["Logica", "Eenvoud"]),
-      null, null, null, null, null
+      null, null, null, null, null,
+      null, null, null, null
     );
 
     insertStandpunt.run(
@@ -202,7 +225,8 @@ if (standpuntenCount.n === 0) {
       "Een investeringsklimaat waarin startups floreren en Nederlandse tech-bedrijven wereldwijd meespelen.",
       "Nederland heeft de kennis, de infrastructuur en het talent om de tech-hub van Europa te worden. Dat vereist een beter investeringsklimaat: meer zekerheid voor durfkapitalisten, betere programma's voor startups in de groeifase, en fiscale prikkels die innovatie belonen. We willen Nederlandse AI-modellen, Nederlandse softwareplatformen die kunnen concurreren met Google en Meta, en datacenters die onze digitale soevereiniteit waarborgen. De overheid faciliteert dit met regelgeving die innovatie versnelt, niet vertraagt. Met gerichte R&D-investeringen en door barrières voor scale-ups weg te nemen.",
       JSON.stringify(["Autonomie", "Logica", "Vrijheid"]),
-      null, null, null, null, null
+      null, null, null, null, null,
+      null, null, null, null
     );
 
     insertStandpunt.run(
@@ -212,7 +236,8 @@ if (standpuntenCount.n === 0) {
       "In een tijd van verdeeldheid zoeken wij naar wat ons verbindt, met respect voor elke achtergrond en overtuiging.",
       "Verschil van mening is gezond. Maar verdeeldheid schaadt. DLP gelooft in het zoeken naar common ground tussen verschillende perspectieven. Wij geven ruimte aan andersdenkenden, aan ieders geloof en afkomst, en aan de dialoog die nodig is om samen vooruit te komen. Respect voor elkaar is de basis van een sterke samenleving. Dat betekent luisteren, begrijpen, en samen zoeken naar oplossingen die voor iedereen werken.",
       JSON.stringify(["Autonomie", "Vrijheid"]),
-      null, null, null, null, null
+      null, null, null, null, null,
+      null, null, null, null
     );
 
     insertStandpunt.run(
@@ -222,7 +247,8 @@ if (standpuntenCount.n === 0) {
       "Investeren in de omstandigheden die criminaliteit veroorzaken, en mensen na een fout een eerlijke weg terug bieden.",
       "Straffen alleen lost niets op. De oorzaken van criminaliteit liggen vaak in armoede, uitzichtloosheid en gebrek aan kansen. DLP wil investeren in preventie: betere omstandigheden, toegang tot onderwijs en werk, en sterke sociale vangnetten. Mensen die in de fout zijn gegaan verdienen een eerlijke weg terug de samenleving in. Met begeleiding, omscholing en werk voorkomen we terugval. Decriminalisering waar dat logisch is, en een rechtssysteem dat gericht is op herstel in plaats van alleen vergelding. Zo bouwen we aan een veiligere samenleving voor iedereen.",
       JSON.stringify(["Autonomie", "Logica", "Vrijheid"]),
-      null, null, null, null, null
+      null, null, null, null, null,
+      null, null, null, null
     );
 
     insertStandpunt.run(
@@ -236,7 +262,10 @@ if (standpuntenCount.n === 0) {
       JSON.stringify(["Kwijtschelding op basis van draagkracht via onafhankelijke commissie", "Terugbetaling over minimaal 10 jaar als percentage van winst", "Snellere doorstart via WHOA, doorstarttermijn naar 12 maanden", "Fiscale tegemoetkoming (investeringsaftrek) voor ondernemers die al hebben afgelost"]),
       "Past binnen EU de-minimisverordening voor schulden tot 300.000 euro. Grotere bedragen vereisen EU-notificatie. Wetswijziging nodig.",
       "Geldt uitsluitend voor belastingschulden uit bijzonder uitstel (maart 2020 tot oktober 2022). Eenmalig, schept geen precedent.",
-      JSON.stringify([{"titel": "Belastingdienst: Bijzonder uitstel van betaling", "url": "https://www.belastingdienst.nl/", "datum": "2024"}, {"titel": "CBS: Bedrijvendynamiek", "url": "https://www.cbs.nl/", "datum": "2025"}, {"titel": "WHOA (Wet homologatie underhands akkoord)", "url": "https://wetten.overheid.nl/", "datum": "2021"}])
+      JSON.stringify([{"titel": "Belastingdienst: Bijzonder uitstel van betaling", "url": "https://www.belastingdienst.nl/", "datum": "2024"}, {"titel": "CBS: Bedrijvendynamiek", "url": "https://www.cbs.nl/", "datum": "2025"}, {"titel": "WHOA (Wet homologatie underhands akkoord)", "url": "https://wetten.overheid.nl/", "datum": "2021"}]),
+      3, 5,
+      "Kwijtschelding corona-belastingschulden: directe kosten van gedeeltelijke kwijtschelding op basis van draagkracht. Geschat op circa 3 miljard euro (niet alle schuld wordt kwijtgescholden).",
+      "Behoud werkgelegenheid en toekomstige belastingopbrengsten: ondernemers die weer op de been komen creeren banen en betalen belasting. Geschat netto-effect circa 5 miljard euro over 10 jaar."
     );
   });
 

@@ -91,6 +91,17 @@
 (function () {
   var API = '/api/begroting';
   var INWONERS = 17800000;
+  var inwonersPerJaar = {};
+  var laatsteTotaalEuro = 0;
+
+  function updatePerNederlander(jaar) {
+    var inw = inwonersPerJaar[jaar] || INWONERS;
+    if (!laatsteTotaalEuro || !inw) return;
+    var pp = Math.round(laatsteTotaalEuro / inw);
+    var mldFormatted = (laatsteTotaalEuro / 1e9).toLocaleString('nl-NL', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    var inwFormatted = (inw / 1e6).toLocaleString('nl-NL', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    totaalPP.textContent = 'Dat is \u20AC' + pp.toLocaleString('nl-NL') + ' per Nederlander (\u20AC' + mldFormatted + ' mld / ' + inwFormatted + ' mln inwoners)';
+  }
   var JAREN = [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
 
   var trendChart = document.getElementById('trend-chart');
@@ -206,12 +217,16 @@
       .then(function (res) { return res.ok ? res.json() : null; })
       .then(function (k) {
         if (!k) return;
+        if (k.bevolking) {
+          inwonersPerJaar[jaar] = k.bevolking;
+          updatePerNederlander(jaar);
+        }
         var saldo = k.saldo_mld || 0;
         var saldoClass = saldo < 0 ? ' kerncijfer--negatief' : '';
 
         var economie = [];
         if (k.uitgaven_mld !== undefined) {
-          economie.push({ waarde: formatMld(k.uitgaven_mld), label: 'Uitgaven' });
+          economie.push({ waarde: formatMld(k.uitgaven_mld), label: 'Uitgaven', cssClass: ' kerncijfer--accent' });
         }
         if (k.ontvangsten_mld !== undefined) {
           economie.push({ waarde: formatMld(k.ontvangsten_mld), label: 'Ontvangsten' });
@@ -220,11 +235,11 @@
           economie.push({ waarde: formatMld(k.saldo_mld), label: saldo < 0 ? 'Tekort' : 'Overschot', cssClass: saldoClass });
         }
         if (k.staatsschuld_mld !== undefined) {
-          var schuldTekst = formatMld(k.staatsschuld_mld);
+          var schuldSub = '';
           if (k.staatsschuld_pct_bbp !== undefined) {
-            schuldTekst += ' (' + formatPct(k.staatsschuld_pct_bbp) + ' BBP)';
+            schuldSub = formatPct(k.staatsschuld_pct_bbp) + ' BBP';
           }
-          economie.push({ waarde: schuldTekst, label: 'Staatsschuld' });
+          economie.push({ waarde: formatMld(k.staatsschuld_mld), sub: schuldSub, label: 'Staatsschuld', cssClass: ' kerncijfer--accent' });
         }
         if (k.inflatie_pct !== undefined) {
           economie.push({ waarde: formatPct(k.inflatie_pct), label: 'Inflatie' });
@@ -405,13 +420,13 @@
     var hoofdstukken = d.hoofdstukken || [];
     var totaal = d.totaal_uitgaven_duizend_euro || d.totaal_uitgaven || 0;
     var totaalEuro = totaal * 1000;
+    laatsteTotaalEuro = totaalEuro;
     var vorigMap = buildVorigJaarMap();
 
     totaalBedrag.textContent = formatBedragGroot(totaal);
     totaalSub.textContent = 'totale rijksuitgaven ' + d.jaar + ' (' + (d.fase || '') + '), verdeeld over ' + hoofdstukken.length + ' begrotingshoofdstukken';
 
-    var pp = Math.round(totaalEuro / INWONERS);
-    totaalPP.textContent = 'Dat is \u20AC' + pp.toLocaleString('nl-NL') + ' per Nederlander';
+    updatePerNederlander(d.jaar);
 
     var sorted = hoofdstukken.slice().sort(function (a, b) { return (b.uitgaven_duizend_euro || b.totaal || 0) - (a.uitgaven_duizend_euro || a.totaal || 0); });
     var max = sorted.length ? (sorted[0].uitgaven_duizend_euro || sorted[0].totaal || 1) : 1;
