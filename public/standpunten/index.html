@@ -222,6 +222,7 @@
           renderJuridisch(s.juridisch) +
           renderBeperkingen(s.beperkingen) +
           renderBronnen(s.bronnen) +
+          '<div class="standpunt-begroting" data-slug="' + escapeAttr(s.slug) + '" hidden></div>' +
           '<button class="standpunt-historie-btn" data-slug="' + escapeAttr(s.slug) + '">' +
             '<i class="lucide lucide-history" aria-hidden="true"></i> Wijzigingsgeschiedenis' +
           '</button>' +
@@ -362,6 +363,32 @@
     searchTimer = setTimeout(renderGrid, 200);
   });
 
+  function loadBegroting(slug, container) {
+    if (container.getAttribute('data-loaded')) return;
+    container.setAttribute('data-loaded', '1');
+
+    fetch(API + '/standpunten/' + encodeURIComponent(slug) + '/begroting')
+      .then(function (res) { return res.ok ? res.json() : null; })
+      .then(function (data) {
+        if (!data) return;
+        var posten = Array.isArray(data) ? data : (data.posten || data.begrotingsposten || []);
+        if (!posten.length) return;
+        container.hidden = false;
+        container.innerHTML = '<div class="standpunt-begroting-inner">' +
+          '<h4><i class="lucide lucide-bar-chart-3" aria-hidden="true"></i> Gerelateerde begrotingsposten</h4>' +
+          '<div class="standpunt-begroting-links">' +
+            posten.map(function (p) {
+              return '<a href="/begroting/" class="standpunt-begroting-link">' +
+                '<strong>' + escapeHtml(p.naam || p.titel || '') + '</strong>' +
+                (p.bedrag ? '<span class="standpunt-begroting-bedrag">' + escapeHtml(p.bedrag) + '</span>' : '') +
+              '</a>';
+            }).join('') +
+          '</div>' +
+        '</div>';
+      })
+      .catch(function () {});
+  }
+
   // Event: accordion toggle + historie
   grid.addEventListener('click', function (e) {
     var toggleBtn = e.target.closest('.standpunt-toggle');
@@ -375,6 +402,9 @@
         ? '<i class="lucide lucide-chevron-down" aria-hidden="true"></i> Lees meer'
         : '<i class="lucide lucide-chevron-up" aria-hidden="true"></i> Sluiten';
       if (!expanded) {
+        var slug = card.getAttribute('data-slug');
+        var begrotingContainer = body.querySelector('.standpunt-begroting[data-slug="' + slug + '"]');
+        if (begrotingContainer) loadBegroting(slug, begrotingContainer);
         var discContainer = body.querySelector('.discussie-container');
         if (discContainer && discContainer.hidden) {
           Discussie.load(discContainer, discContainer.getAttribute('data-disc-type'), discContainer.getAttribute('data-disc-slug'));

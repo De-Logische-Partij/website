@@ -367,6 +367,88 @@ db.exec(`
   )
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS begroting_commentaar (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    jaar INTEGER NOT NULL,
+    hoofdstuk_nummer TEXT NOT NULL,
+    uitleg TEXT NOT NULL,
+    dlp_mening TEXT NOT NULL,
+    standpunt_slugs TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now')),
+    UNIQUE(jaar, hoofdstuk_nummer)
+  )
+`);
+
+const commentaarCount = db.query("SELECT COUNT(*) as n FROM begroting_commentaar").get() as { n: number };
+
+if (commentaarCount.n === 0) {
+  const insertCommentaar = db.prepare(
+    "INSERT INTO begroting_commentaar (jaar, hoofdstuk_nummer, uitleg, dlp_mening, standpunt_slugs) VALUES (?, ?, ?, ?, ?)"
+  );
+
+  const seedCommentaar = db.transaction(() => {
+    insertCommentaar.run(
+      2026, "XV",
+      "Sociale Zaken en Werkgelegenheid is de grootste begrotingspost. Het overgrote deel gaat naar uitkeringen, pensioenen en het toeslagenstelsel. De complexiteit van het toeslagenstelsel leidt tot hoge uitvoeringskosten en fouten die burgers raken.",
+      "Een groot deel van dit budget gaat naar toeslagen. Met een vlaktaks en afschaffing van het toeslagenstelsel kan dit simpeler en eerlijker. Ondernemers met coronaschulden verdienen daarbij een schone lei.",
+      JSON.stringify(["vlaktaks", "schone-lei-corona-ondernemers"])
+    );
+
+    insertCommentaar.run(
+      2026, "XVI",
+      "Volksgezondheid, Welzijn en Sport omvat de Zorgverzekeringswet, Wet langdurige zorg en het volksgezondheidsbeleid. De zorgkosten stijgen jaarlijks, terwijl zorgprofessionals steeds meer tijd kwijt zijn aan administratie.",
+      "Zorgprofessionals verdienen vertrouwen en minder papierwerk. Wij willen investeren in GGZ en preventie, zodat meer geld naar daadwerkelijke zorg gaat in plaats van bureaucratie.",
+      JSON.stringify(["zorg"])
+    );
+
+    insertCommentaar.run(
+      2026, "VIII",
+      "Onderwijs, Cultuur en Wetenschap financiert het hele onderwijsstelsel van basisonderwijs tot universiteit, plus cultuursubsidies en wetenschappelijk onderzoek.",
+      "Onderwijs dat meegaat met de tijd. Ruimte voor eigen routes en leerrecht, zodat elk kind zich kan ontwikkelen op een manier die bij hen past.",
+      JSON.stringify(["leerrecht"])
+    );
+
+    insertCommentaar.run(
+      2026, "X",
+      "Defensie financiert de krijgsmacht, materieelonderhoud en internationale missies. Na jaren van bezuinigingen wordt er weer geinvesteerd, maar de nadruk ligt nog steeds op traditionele capaciteiten.",
+      "Defensie moet investeren in cyberveiligheid en digitale weerbaarheid. Een Minister van AI en Technologie kan deze digitale transformatie aansturen en versnellen.",
+      JSON.stringify(["minister-ai-technologie", "digitale-soevereiniteit"])
+    );
+
+    insertCommentaar.run(
+      2026, "XIII",
+      "Economische Zaken en Klimaat stimuleert economische groei, innovatie, ondernemerschap en energietransitie. Hieronder vallen ook subsidies voor bedrijven en het klimaatbeleid.",
+      "Nederland als tech-hub van Europa. Meer investering in startups en innovatie, minder bureaucratie voor ondernemers. De overheid faciliteert, niet controleert.",
+      JSON.stringify(["ondernemers-bevrijden", "nederland-tech-hub"])
+    );
+
+    insertCommentaar.run(
+      2026, "B",
+      "Het Gemeentefonds verdeelt rijksgeld over alle gemeenten voor lokale taken zoals bijstand, jeugdzorg, WMO en infrastructuur. Gemeenten hebben vaak te weinig budget voor hun taken.",
+      "Gemeenten staan dicht bij de burger. Meer financiele autonomie voor gemeenten betekent betere lokale dienstverlening en minder afhankelijkheid van Den Haag.",
+      JSON.stringify(["directe-democratie", "glazen-begroting"])
+    );
+
+    insertCommentaar.run(
+      2026, "IX",
+      "Financien en Nationale Schuld omvat het beheer van de staatsschuld, belastinginning en het toezicht op de financiele sector. De Belastingdienst valt onder dit hoofdstuk.",
+      "De rijksbegroting moet transparant en begrijpelijk zijn voor elke burger. Een interactief dashboard in plaats van duizenden pagina's onleesbare PDF's.",
+      JSON.stringify(["glazen-begroting", "vlaktaks"])
+    );
+
+    insertCommentaar.run(
+      2026, "XII",
+      "Infrastructuur en Waterstaat financiert wegen, spoor, waterbeheer en luchtvaart. Het Mobiliteitsfonds is hieraan gekoppeld voor grote infrastructuurprojecten.",
+      "Bouwen moet sneller en simpeler. Vergunningen binnen 30 dagen, ruimte voor innovatieve woonvormen en minder bezwaarprocedures die projecten vertragen.",
+      JSON.stringify(["bouwen"])
+    );
+  });
+
+  seedCommentaar();
+}
+
 const FACTUUR_5884_HASH = "16b5df41a611cd90450ab1c57382b809936f75ff50f92bf4cb21462c4a5e3fae";
 const FACTUUR_5884_URL = "/receipts/Factuur-5884.pdf";
 

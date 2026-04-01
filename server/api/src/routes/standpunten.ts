@@ -163,6 +163,44 @@ standpunten.get("/:slug/historie", (c) => {
   });
 });
 
+standpunten.get("/:slug/begroting", (c) => {
+  const slug = c.req.param("slug");
+
+  const standpunt = db
+    .query("SELECT id, titel FROM standpunten WHERE slug = ?")
+    .get(slug) as { id: number; titel: string } | null;
+
+  if (!standpunt) {
+    return c.json({ error: "Standpunt niet gevonden" }, 404);
+  }
+
+  const rows = db
+    .query("SELECT * FROM begroting_commentaar")
+    .all() as {
+      jaar: number;
+      hoofdstuk_nummer: string;
+      uitleg: string;
+      dlp_mening: string;
+      standpunt_slugs: string | null;
+    }[];
+
+  const linked = rows.filter((r) => {
+    if (!r.standpunt_slugs) return false;
+    const slugs: string[] = JSON.parse(r.standpunt_slugs);
+    return slugs.includes(slug);
+  });
+
+  return c.json({
+    standpunt: standpunt.titel,
+    begrotingsposten: linked.map((r) => ({
+      jaar: r.jaar,
+      hoofdstuk_nummer: r.hoofdstuk_nummer,
+      uitleg: r.uitleg,
+      dlp_mening: r.dlp_mening,
+    })),
+  });
+});
+
 // Admin routes
 const adminStandpunten = new Hono();
 

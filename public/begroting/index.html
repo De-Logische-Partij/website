@@ -54,22 +54,17 @@
   <section class="begroting-section" id="begroting">
     <div class="section-inner">
 
-      <div class="begroting-jaar-selector" id="jaar-selector" role="group" aria-label="Selecteer jaar">
-        <button class="jaar-btn" data-jaar="2018">2018</button>
-        <button class="jaar-btn" data-jaar="2019">2019</button>
-        <button class="jaar-btn" data-jaar="2020">2020</button>
-        <button class="jaar-btn" data-jaar="2021">2021</button>
-        <button class="jaar-btn" data-jaar="2022">2022</button>
-        <button class="jaar-btn" data-jaar="2023">2023</button>
-        <button class="jaar-btn" data-jaar="2024">2024</button>
-        <button class="jaar-btn" data-jaar="2025">2025</button>
-        <button class="jaar-btn active" data-jaar="2026">2026</button>
+      <div class="trend-chart" id="trend-chart" aria-label="Totale rijksuitgaven per jaar">
+        <p class="begroting-laden" id="trend-laden">Trend wordt geladen...</p>
       </div>
 
       <div class="begroting-totaal" id="begroting-totaal">
         <div class="begroting-totaal-bedrag" id="totaal-bedrag">Laden...</div>
         <div class="begroting-totaal-sub" id="totaal-sub"></div>
+        <div class="begroting-totaal-pp" id="totaal-pp"></div>
       </div>
+
+      <div class="kerncijfers" id="kerncijfers" hidden></div>
 
       <div class="begroting-chart" id="begroting-chart">
         <p class="begroting-laden" id="begroting-laden">Begrotingsdata wordt geladen...</p>
@@ -95,15 +90,46 @@
 <script>
 (function () {
   var API = '/api/begroting';
+  var INWONERS = 17800000;
+  var JAREN = [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
+
+  var trendChart = document.getElementById('trend-chart');
+  var trendLaden = document.getElementById('trend-laden');
   var chart = document.getElementById('begroting-chart');
-  var laden = document.getElementById('begroting-laden');
   var totaalBedrag = document.getElementById('totaal-bedrag');
   var totaalSub = document.getElementById('totaal-sub');
+  var totaalPP = document.getElementById('totaal-pp');
+  var kerncijfersEl = document.getElementById('kerncijfers');
   var detail = document.getElementById('begroting-detail');
-  var jaarSelector = document.getElementById('jaar-selector');
 
   var huidigJaar = 2026;
   var data = null;
+  var trendData = {};
+
+  var uitleg = {
+    'De Koning': 'Het budget voor de Koning, het Koninklijk Huis en de Dienst van het Koninklijk Huis.',
+    'Staten-Generaal': 'De Eerste en Tweede Kamer: het parlement dat wetten maakt en de regering controleert.',
+    'Algemene Zaken': 'Het ministerie van de minister-president, verantwoordelijk voor het algemeen regeringsbeleid.',
+    'Koninkrijksrelaties': 'De samenwerking met en ondersteuning van Aruba, Curacao en Sint Maarten.',
+    'Buitenlandse Zaken': 'Diplomatie, internationale samenwerking en hulp aan Nederlanders in het buitenland.',
+    'Justitie en Veiligheid': 'Politie, rechtspraak, gevangeniswezen, terrorismebestrijding en asielbeleid.',
+    'Binnenlandse Zaken en Koninkrijksrelaties': 'Bestuur, democratie, woningmarkt, digitale overheid en de ambtenarij.',
+    'Onderwijs, Cultuur en Wetenschap': 'Scholen, universiteiten, onderzoek, bibliotheken en culturele instellingen.',
+    'Financien': 'Belastingdienst, het begrotingsbeleid en het financieel toezicht op de overheid.',
+    'Defensie': 'De krijgsmacht: landmacht, marine, luchtmacht en marechaussee.',
+    'Infrastructuur en Waterstaat': 'Wegen, spoor, bruggen, dijken, waterbeheer en luchtvaart.',
+    'Economische Zaken en Klimaat': 'Ondernemingsklimaat, innovatie, energie, klimaat en landbouw.',
+    'Landbouw, Natuur en Voedselkwaliteit': 'Agrarische sector, natuurbeheer, dierenwelzijn en voedselveiligheid.',
+    'Sociale Zaken en Werkgelegenheid': 'Werkloosheidsuitkeringen, arbeidsrecht, pensioenen en armoedebeleid.',
+    'Volksgezondheid, Welzijn en Sport': 'Ziekenhuizen, zorgverzekering, jeugdzorg, sport en welzijnswerk.',
+    'Gemeentefonds': 'Geld van het Rijk dat wordt verdeeld over alle Nederlandse gemeenten.',
+    'Provinciefonds': 'Geld van het Rijk dat wordt verdeeld over alle Nederlandse provincies.',
+    'Infrastructuurfonds': 'Investeringen in aanleg en onderhoud van wegen, spoor en vaarwegen.',
+    'Deltafonds': 'Investeringen in waterveiligheid, zoetwatervoorziening en waterkwaliteit.',
+    'Nationaal Groeifonds': 'Langetermijninvesteringen in kennis, innovatie en infrastructuur voor economische groei.',
+    'BES-fonds': 'Geld voor Bonaire, Sint Eustatius en Saba, de bijzondere gemeenten in het Caribisch gebied.',
+    'Nationale Schuld': 'Rente en aflossing op de staatsleningen waarmee het begrotingstekort wordt gefinancierd.'
+  };
 
   function formatBedrag(duizenden) {
     var euro = duizenden * 1000;
@@ -139,22 +165,210 @@
     return (str || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
   }
 
+  function formatMld(n) {
+    if (n === undefined || n === null) return '';
+    var abs = Math.abs(n);
+    return (n < 0 ? '-' : '') + '\u20AC' + abs.toLocaleString('nl-NL', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' mld';
+  }
+
+  function formatPct(n) {
+    if (n === undefined || n === null) return '';
+    return n.toLocaleString('nl-NL', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%';
+  }
+
+  function formatAantal(n) {
+    if (n === undefined || n === null) return '';
+    if (n >= 1e6) {
+      return (n / 1e6).toLocaleString('nl-NL', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' mln';
+    }
+    return n.toLocaleString('nl-NL');
+  }
+
+  function renderKerncijferRij(label, cards) {
+    if (!cards.length) return '';
+    return '<div class="kerncijfers-rij">' +
+      '<span class="kerncijfers-rij-label">' + escapeHtml(label) + '</span>' +
+      '<div class="kerncijfers-grid">' +
+        cards.map(function (c) {
+          return '<div class="kerncijfer' + (c.cssClass || '') + '">' +
+            '<span class="kerncijfer-waarde">' + c.waarde + '</span>' +
+            (c.sub ? '<span class="kerncijfer-sub">' + c.sub + '</span>' : '') +
+            '<span class="kerncijfer-label">' + escapeHtml(c.label) + '</span>' +
+          '</div>';
+        }).join('') +
+      '</div>' +
+    '</div>';
+  }
+
+  function loadKerncijfers(jaar) {
+    kerncijfersEl.hidden = true;
+    fetch(API + '/' + jaar + '/kerncijfers')
+      .then(function (res) { return res.ok ? res.json() : null; })
+      .then(function (k) {
+        if (!k) return;
+        var saldo = k.saldo_mld || 0;
+        var saldoClass = saldo < 0 ? ' kerncijfer--negatief' : '';
+
+        var economie = [];
+        if (k.uitgaven_mld !== undefined) {
+          economie.push({ waarde: formatMld(k.uitgaven_mld), label: 'Uitgaven' });
+        }
+        if (k.ontvangsten_mld !== undefined) {
+          economie.push({ waarde: formatMld(k.ontvangsten_mld), label: 'Ontvangsten' });
+        }
+        if (k.saldo_mld !== undefined) {
+          economie.push({ waarde: formatMld(k.saldo_mld), label: saldo < 0 ? 'Tekort' : 'Overschot', cssClass: saldoClass });
+        }
+        if (k.staatsschuld_mld !== undefined) {
+          var schuldTekst = formatMld(k.staatsschuld_mld);
+          if (k.staatsschuld_pct_bbp !== undefined) {
+            schuldTekst += ' (' + formatPct(k.staatsschuld_pct_bbp) + ' BBP)';
+          }
+          economie.push({ waarde: schuldTekst, label: 'Staatsschuld' });
+        }
+        if (k.inflatie_pct !== undefined) {
+          economie.push({ waarde: formatPct(k.inflatie_pct), label: 'Inflatie' });
+        }
+        if (k.werkloosheid_pct !== undefined) {
+          economie.push({ waarde: formatPct(k.werkloosheid_pct), label: 'Werkloosheid' });
+        }
+
+        var demografie = [];
+        if (k.bevolking !== undefined) {
+          var inwonersWaarde = formatAantal(k.bevolking);
+          var inwonersSub = '';
+          if (k.bevolkingsgroei_pct !== undefined) {
+            var groei = k.bevolkingsgroei_pct;
+            var sign = groei >= 0 ? '+' : '';
+            inwonersSub = '<span class="kerncijfer-delta' + (groei >= 0 ? ' kerncijfer-delta--groei' : ' kerncijfer-delta--krimp') + '">' + sign + formatPct(groei) + '</span>';
+          }
+          demografie.push({ waarde: inwonersWaarde, sub: inwonersSub, label: 'Inwoners' });
+        }
+        if (k.belastingplichtigen !== undefined) {
+          var bpWaarde = formatAantal(k.belastingplichtigen);
+          var bpSub = '';
+          if (k.uitgaven_mld !== undefined && k.belastingplichtigen > 0) {
+            var ppBp = Math.round((k.uitgaven_mld * 1e9) / k.belastingplichtigen);
+            bpSub = '\u20AC' + ppBp.toLocaleString('nl-NL') + ' p.p.';
+          }
+          demografie.push({ waarde: bpWaarde, sub: bpSub, label: 'Belastingplichtigen' });
+        }
+        if (k.geboorten !== undefined) {
+          demografie.push({ waarde: formatAantal(k.geboorten), label: 'Geboorten' });
+        }
+        if (k.overlijdens !== undefined) {
+          demografie.push({ waarde: formatAantal(k.overlijdens), label: 'Overlijdens' });
+        }
+        if (k.immigratie !== undefined) {
+          demografie.push({ waarde: formatAantal(k.immigratie), label: 'Immigratie' });
+        }
+        if (k.emigratie !== undefined) {
+          demografie.push({ waarde: formatAantal(k.emigratie), label: 'Emigratie' });
+        }
+
+        if (!economie.length && !demografie.length && !k.context) return;
+
+        var contextHtml = '';
+        if (k.context) {
+          contextHtml += '<div class="kerncijfers-context">' +
+            '<p>' + escapeHtml(k.context) + '</p>' +
+          '</div>';
+        }
+        if (k.gebeurtenissen && k.gebeurtenissen.length) {
+          contextHtml += '<div class="kerncijfers-events">' +
+            k.gebeurtenissen.map(function (g) {
+              return '<span class="kerncijfers-event">' + escapeHtml(g) + '</span>';
+            }).join('') +
+          '</div>';
+        }
+
+        kerncijfersEl.innerHTML =
+          renderKerncijferRij('Economie', economie) +
+          renderKerncijferRij('Demografie', demografie) +
+          contextHtml +
+          '<span class="kerncijfers-bron">Bron: CBS, CPB (indicatief)</span>';
+        kerncijfersEl.hidden = false;
+      })
+      .catch(function () {});
+  }
+
+  function loadTrend() {
+    var promises = JAREN.map(function (jaar) {
+      return fetch(API + '/' + jaar)
+        .then(function (res) { return res.json(); })
+        .then(function (d) { trendData[jaar] = d; })
+        .catch(function () { trendData[jaar] = null; });
+    });
+
+    Promise.all(promises).then(function () {
+      renderTrend();
+      if (trendData[huidigJaar]) {
+        data = trendData[huidigJaar];
+        renderOverzicht(data);
+      }
+      loadKerncijfers(huidigJaar);
+    });
+  }
+
+  function renderTrend() {
+    var totalen = JAREN.map(function (jaar) {
+      var d = trendData[jaar];
+      if (!d) return { jaar: jaar, totaal: 0 };
+      return { jaar: jaar, totaal: (d.totaal_uitgaven_duizend_euro || d.totaal_uitgaven || 0) * 1000 };
+    });
+
+    var max = Math.max.apply(null, totalen.map(function (t) { return t.totaal; }));
+    if (max <= 0) max = 1;
+
+    trendChart.innerHTML = '<div class="trend-bars">' +
+      totalen.map(function (t) {
+        var pct = Math.max((t.totaal / max) * 100, 2);
+        var isActive = t.jaar === huidigJaar;
+        var mld = (t.totaal / 1e9).toLocaleString('nl-NL', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        return '<button class="trend-bar-col' + (isActive ? ' trend-bar-col--active' : '') + '" data-jaar="' + t.jaar + '" type="button">' +
+          '<span class="trend-bedrag">\u20AC' + mld + ' mld</span>' +
+          '<div class="trend-bar-wrap"><div class="trend-bar' + (isActive ? ' trend-bar--active' : '') + '" style="height:' + pct + '%"></div></div>' +
+          '<span class="trend-jaar">' + t.jaar + '</span>' +
+        '</button>';
+      }).join('') +
+    '</div>';
+  }
+
+  function selectJaar(jaar) {
+    huidigJaar = jaar;
+    detail.hidden = true;
+
+    trendChart.querySelectorAll('.trend-bar-col').forEach(function (col) {
+      var isActive = col.getAttribute('data-jaar') === String(jaar);
+      col.classList.toggle('trend-bar-col--active', isActive);
+      col.querySelector('.trend-bar').classList.toggle('trend-bar--active', isActive);
+    });
+
+    if (trendData[jaar]) {
+      data = trendData[jaar];
+      renderOverzicht(data);
+    } else {
+      loadJaar(jaar);
+    }
+    loadKerncijfers(jaar);
+  }
+
   function loadJaar(jaar) {
     huidigJaar = jaar;
     totaalBedrag.textContent = 'Laden...';
     totaalSub.textContent = '';
+    totaalPP.textContent = '';
+    kerncijfersEl.hidden = true;
     chart.innerHTML = '<p class="begroting-laden">Begrotingsdata wordt geladen...</p>';
     detail.hidden = true;
-
-    jaarSelector.querySelectorAll('.jaar-btn').forEach(function (b) {
-      b.classList.toggle('active', b.getAttribute('data-jaar') === String(jaar));
-    });
 
     fetch(API + '/' + jaar)
       .then(function (res) { return res.json(); })
       .then(function (d) {
         data = d;
+        trendData[jaar] = d;
         renderOverzicht(d);
+        loadKerncijfers(jaar);
       })
       .catch(function () {
         totaalBedrag.textContent = '--';
@@ -162,12 +376,42 @@
       });
   }
 
+  function buildVorigJaarMap() {
+    var vorigJaar = huidigJaar - 1;
+    var vd = trendData[vorigJaar];
+    if (!vd) return {};
+    var map = {};
+    (vd.hoofdstukken || []).forEach(function (h) {
+      var nr = h.hoofdstuk_nummer || h.hoofdstuk_nr || '';
+      map[nr] = h.uitgaven_duizend_euro || h.totaal || 0;
+    });
+    return map;
+  }
+
+  function renderDelta(bedrag, vorigBedrag) {
+    if (vorigBedrag === undefined || vorigBedrag === null) return '';
+    if (vorigBedrag === 0 && bedrag === 0) return '';
+    var verschil = bedrag - vorigBedrag;
+    if (verschil === 0) return '<span class="begroting-delta begroting-delta--gelijk">0%</span>';
+    var pct = vorigBedrag !== 0 ? ((verschil / vorigBedrag) * 100) : 0;
+    var pctStr = Math.abs(pct).toLocaleString('nl-NL', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    if (verschil > 0) {
+      return '<span class="begroting-delta begroting-delta--groei"><i class="lucide lucide-trending-up" aria-hidden="true"></i> +' + pctStr + '%</span>';
+    }
+    return '<span class="begroting-delta begroting-delta--krimp"><i class="lucide lucide-trending-down" aria-hidden="true"></i> -' + pctStr + '%</span>';
+  }
+
   function renderOverzicht(d) {
     var hoofdstukken = d.hoofdstukken || [];
     var totaal = d.totaal_uitgaven_duizend_euro || d.totaal_uitgaven || 0;
+    var totaalEuro = totaal * 1000;
+    var vorigMap = buildVorigJaarMap();
 
     totaalBedrag.textContent = formatBedragGroot(totaal);
     totaalSub.textContent = 'totale rijksuitgaven ' + d.jaar + ' (' + (d.fase || '') + '), verdeeld over ' + hoofdstukken.length + ' begrotingshoofdstukken';
+
+    var pp = Math.round(totaalEuro / INWONERS);
+    totaalPP.textContent = 'Dat is \u20AC' + pp.toLocaleString('nl-NL') + ' per Nederlander';
 
     var sorted = hoofdstukken.slice().sort(function (a, b) { return (b.uitgaven_duizend_euro || b.totaal || 0) - (a.uitgaven_duizend_euro || a.totaal || 0); });
     var max = sorted.length ? (sorted[0].uitgaven_duizend_euro || sorted[0].totaal || 1) : 1;
@@ -177,17 +421,49 @@
       var nr = h.hoofdstuk_nummer || h.hoofdstuk_nr || '';
       var naam = h.naam || h.hoofdstuk_naam || '';
       var pct = max > 0 ? Math.max((bedrag / max) * 100, 1) : 1;
+      var uitlegTekst = uitleg[naam] || '';
+      var deltaHtml = nr in vorigMap ? renderDelta(bedrag, vorigMap[nr]) : '';
       return '<div class="begroting-bar-row" data-hoofdstuk="' + escapeAttr(nr) + '">' +
         '<div class="begroting-bar-label">' +
-          '<span class="begroting-bar-nr">' + escapeHtml(nr) + '</span>' +
-          '<span class="begroting-bar-naam">' + escapeHtml(naam) + '</span>' +
+          '<div class="begroting-bar-naam-wrap">' +
+            '<span class="begroting-bar-naam">' + escapeHtml(naam) + '</span>' +
+            (uitlegTekst ? '<span class="begroting-bar-uitleg">' + escapeHtml(uitlegTekst) + '</span>' : '') +
+          '</div>' +
+          '<div class="begroting-bar-bedrag-wrap">' +
+            '<span class="begroting-bar-bedrag">' + formatBedrag(bedrag) + '</span>' +
+            deltaHtml +
+          '</div>' +
         '</div>' +
         '<div class="begroting-bar-track">' +
           '<div class="begroting-bar-fill" style="width:' + pct + '%"></div>' +
         '</div>' +
-        '<span class="begroting-bar-bedrag">' + formatBedrag(bedrag) + '</span>' +
       '</div>';
     }).join('');
+  }
+
+  function renderCommentaar(c) {
+    if (!c) return '';
+    var html = '';
+    if (c.dlp_mening) {
+      html += '<div class="begroting-dlp-visie">' +
+        '<span class="begroting-dlp-label"><i class="lucide lucide-lightbulb" aria-hidden="true"></i> Onze kijk</span>' +
+        '<p>' + escapeHtml(c.dlp_mening) + '</p>' +
+      '</div>';
+    }
+    if (c.standpunten && c.standpunten.length) {
+      html += '<div class="begroting-standpunten">' +
+        '<span class="begroting-standpunten-label">Gerelateerde standpunten:</span>' +
+        '<div class="begroting-standpunten-lijst">' +
+          c.standpunten.map(function (s) {
+            return '<a href="/standpunten/#' + escapeAttr(s.slug) + '" class="begroting-standpunt-link">' +
+              '<strong>' + escapeHtml(s.titel) + '</strong>' +
+              (s.samenvatting ? '<span>' + escapeHtml(s.samenvatting) + '</span>' : '') +
+            '</a>';
+          }).join('') +
+        '</div>' +
+      '</div>';
+    }
+    return html;
   }
 
   function loadDetail(hoofdstukNr) {
@@ -198,44 +474,49 @@
     var h = (data.hoofdstukken || []).find(function (x) { return (x.hoofdstuk_nummer || x.hoofdstuk_nr) === hoofdstukNr; });
     var naam = h ? (h.naam || h.hoofdstuk_naam) : hoofdstukNr;
 
-    fetch(API + '/' + huidigJaar + '/' + encodeURIComponent(hoofdstukNr))
-      .then(function (res) { return res.json(); })
-      .then(function (d) {
-        var artikelen = d.artikelen || d.onderdelen || [];
-        var sorted = artikelen.slice().sort(function (a, b) { return (b.uitgaven || b.totaal || 0) - (a.uitgaven || a.totaal || 0); });
-        var max = sorted.length ? (sorted[0].uitgaven || sorted[0].totaal || 1) : 1;
+    var detailUrl = API + '/' + huidigJaar + '/' + encodeURIComponent(hoofdstukNr);
+    var commentaarUrl = detailUrl + '/commentaar';
 
-        detail.innerHTML = '<div class="begroting-detail-header">' +
-            '<button class="begroting-detail-close" id="detail-close"><i class="lucide lucide-x" aria-hidden="true"></i> Sluiten</button>' +
-            '<h3><span class="begroting-bar-nr">' + escapeHtml(hoofdstukNr) + '</span> ' + escapeHtml(naam) + '</h3>' +
-          '</div>' +
-          '<div class="begroting-detail-bars">' +
-            (sorted.length ? sorted.map(function (a) {
-              var bedrag = a.uitgaven || a.totaal || 0;
-              var pct = max > 0 ? Math.max((bedrag / max) * 100, 1) : 1;
-              return '<div class="begroting-bar-row begroting-bar-row--detail">' +
-                '<div class="begroting-bar-label">' +
-                  (a.artikel_nr ? '<span class="begroting-bar-nr">' + escapeHtml(a.artikel_nr) + '</span>' : '') +
-                  '<span class="begroting-bar-naam">' + escapeHtml(a.naam || a.artikel_naam || '') + '</span>' +
-                '</div>' +
-                '<div class="begroting-bar-track">' +
-                  '<div class="begroting-bar-fill begroting-bar-fill--detail" style="width:' + pct + '%"></div>' +
-                '</div>' +
+    Promise.all([
+      fetch(detailUrl).then(function (res) { return res.json(); }),
+      fetch(commentaarUrl).then(function (res) { return res.ok ? res.json() : null; }).catch(function () { return null; })
+    ]).then(function (results) {
+      var d = results[0];
+      var commentaar = results[1];
+      var artikelen = d.artikelen || d.onderdelen || [];
+      var sorted = artikelen.slice().sort(function (a, b) { return (b.totaal_duizend_euro || b.uitgaven || b.totaal || 0) - (a.totaal_duizend_euro || a.uitgaven || a.totaal || 0); });
+      var max = sorted.length ? (sorted[0].totaal_duizend_euro || sorted[0].uitgaven || sorted[0].totaal || 1) : 1;
+
+      detail.innerHTML = '<div class="begroting-detail-header">' +
+          '<button class="begroting-detail-close" id="detail-close"><i class="lucide lucide-x" aria-hidden="true"></i> Sluiten</button>' +
+          '<h3>' + escapeHtml(naam) + '</h3>' +
+        '</div>' +
+        renderCommentaar(commentaar) +
+        '<div class="begroting-detail-bars">' +
+          (sorted.length ? sorted.map(function (a) {
+            var bedrag = a.totaal_duizend_euro || a.uitgaven || a.totaal || 0;
+            var pct = max > 0 ? Math.max((bedrag / max) * 100, 1) : 1;
+            return '<div class="begroting-bar-row begroting-bar-row--detail">' +
+              '<div class="begroting-bar-label">' +
+                '<span class="begroting-bar-naam">' + escapeHtml(a.naam || a.artikel_naam || '') + '</span>' +
                 '<span class="begroting-bar-bedrag">' + formatBedrag(bedrag) + '</span>' +
-              '</div>';
-            }).join('') : '<p class="begroting-laden">Geen artikelen beschikbaar.</p>') +
-          '</div>';
-      })
-      .catch(function () {
-        detail.innerHTML = '<p class="begroting-laden">Kan detail niet laden.</p>';
-      });
+              '</div>' +
+              '<div class="begroting-bar-track">' +
+                '<div class="begroting-bar-fill begroting-bar-fill--detail" style="width:' + pct + '%"></div>' +
+              '</div>' +
+            '</div>';
+          }).join('') : '<p class="begroting-laden">Geen artikelen beschikbaar.</p>') +
+        '</div>';
+    }).catch(function () {
+      detail.innerHTML = '<p class="begroting-laden">Kan detail niet laden.</p>';
+    });
   }
 
-  // Jaar selector
-  jaarSelector.addEventListener('click', function (e) {
-    var btn = e.target.closest('.jaar-btn');
-    if (!btn) return;
-    loadJaar(parseInt(btn.getAttribute('data-jaar'), 10));
+  // Trend bar click
+  trendChart.addEventListener('click', function (e) {
+    var col = e.target.closest('.trend-bar-col');
+    if (!col) return;
+    selectJaar(parseInt(col.getAttribute('data-jaar'), 10));
   });
 
   // Bar click
@@ -253,7 +534,7 @@
     }
   });
 
-  loadJaar(2026);
+  loadTrend();
 })();
 </script>
 </body>

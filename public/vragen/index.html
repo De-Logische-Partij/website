@@ -193,8 +193,11 @@
             '<span class="stem-totaal">' + totaal + ' stemmen</span>' +
           '</div>';
         } else if (voted && totaal === 0) {
-          stemHtml = '<div class="vraag-stem-resultaat">' +
-            '<span class="stem-totaal">Nog geen stemmen</span>' +
+          localStorage.removeItem('vraag-stem-' + v.slug);
+          voted = null;
+          stemHtml = '<div class="vraag-stem" data-slug="' + escapeAttr(v.slug) + '">' +
+            '<button class="stem-btn stem-btn--eens" data-stem="eens"><i class="lucide lucide-thumbs-up" aria-hidden="true"></i> Eens</button>' +
+            '<button class="stem-btn stem-btn--oneens" data-stem="oneens"><i class="lucide lucide-thumbs-down" aria-hidden="true"></i> Oneens</button>' +
           '</div>';
         } else {
           stemHtml = '<div class="vraag-stem" data-slug="' + escapeAttr(v.slug) + '">' +
