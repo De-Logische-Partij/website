@@ -217,19 +217,35 @@
           '</button>' +
         '</div>' +
         '<div class="standpunt-body" hidden>' +
-          '<div class="standpunt-inhoud">' + formatInhoud(s.inhoud || s.samenvatting || '') + '</div>' +
-          renderCijfers(parseField(s.cijfers)) +
-          renderMaatregelen(parseField(s.maatregelen)) +
-          renderJuridisch(s.juridisch) +
-          renderBeperkingen(s.beperkingen) +
-          renderBronnen(parseField(s.bronnen)) +
-          '<div class="standpunt-begroting" data-slug="' + escapeAttr(s.slug) + '" hidden></div>' +
-          '<a href="/standpunten/' + escapeAttr(s.slug) + '" class="standpunt-deel-link"><i class="lucide lucide-link" aria-hidden="true"></i> Deel dit standpunt</a>' +
-          '<button class="standpunt-historie-btn" data-slug="' + escapeAttr(s.slug) + '">' +
-            '<i class="lucide lucide-history" aria-hidden="true"></i> Wijzigingsgeschiedenis' +
-          '</button>' +
-          '<div class="standpunt-historie" data-slug="' + escapeAttr(s.slug) + '" hidden></div>' +
-          '<div class="discussie-container" data-disc-type="standpunt" data-disc-slug="' + escapeAttr(s.slug) + '" hidden></div>' +
+          '<nav class="sp-tabs">' +
+            '<button class="sp-tab active" data-tab="overzicht"><i class="lucide lucide-file-text" aria-hidden="true"></i> Overzicht</button>' +
+            '<button class="sp-tab" data-tab="onderbouwing"><i class="lucide lucide-scale" aria-hidden="true"></i> Onderbouwing</button>' +
+            '<button class="sp-tab" data-tab="financieel"><i class="lucide lucide-bar-chart-3" aria-hidden="true"></i> Financieel</button>' +
+            '<button class="sp-tab" data-tab="discussie"><i class="lucide lucide-message-circle" aria-hidden="true"></i> Discussie</button>' +
+          '</nav>' +
+          '<div class="sp-panel active" data-panel="overzicht">' +
+            '<div class="standpunt-inhoud">' + formatInhoud(s.inhoud || s.samenvatting || '') + '</div>' +
+            renderCijfers(parseField(s.cijfers)) +
+            renderMaatregelen(parseField(s.maatregelen)) +
+          '</div>' +
+          '<div class="sp-panel" data-panel="onderbouwing">' +
+            renderJuridisch(s.juridisch) +
+            renderBeperkingen(s.beperkingen) +
+            renderBronnen(parseField(s.bronnen)) +
+            '<button class="standpunt-historie-btn" data-slug="' + escapeAttr(s.slug) + '">' +
+              '<i class="lucide lucide-history" aria-hidden="true"></i> Wijzigingsgeschiedenis' +
+            '</button>' +
+            '<div class="standpunt-historie" data-slug="' + escapeAttr(s.slug) + '" hidden></div>' +
+          '</div>' +
+          '<div class="sp-panel" data-panel="financieel">' +
+            '<div class="standpunt-begroting" data-slug="' + escapeAttr(s.slug) + '" hidden></div>' +
+          '</div>' +
+          '<div class="sp-panel" data-panel="discussie">' +
+            '<div class="discussie-container" data-disc-type="standpunt" data-disc-slug="' + escapeAttr(s.slug) + '" hidden></div>' +
+          '</div>' +
+          '<div class="sp-footer">' +
+            '<a href="/standpunten/' + escapeAttr(s.slug) + '" class="standpunt-deel-link"><i class="lucide lucide-link" aria-hidden="true"></i> Deel dit standpunt</a>' +
+          '</div>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -277,7 +293,7 @@
   function renderBeperkingen(beperkingen) {
     if (!beperkingen) return '';
     return '<div class="standpunt-beperkingen">' +
-      '<h4>Eerlijk over beperkingen</h4>' +
+      '<h4><i class="lucide lucide-alert-triangle" aria-hidden="true"></i> Eerlijk over beperkingen</h4>' +
       '<p>' + escapeHtml(beperkingen) + '</p>' +
     '</div>';
   }
@@ -400,7 +416,28 @@
       .catch(function () {});
   }
 
-  // Event: accordion toggle + historie
+  function activateTab(card, tabName) {
+    card.querySelectorAll('.sp-tab').forEach(function (t) {
+      t.classList.toggle('active', t.getAttribute('data-tab') === tabName);
+    });
+    card.querySelectorAll('.sp-panel').forEach(function (p) {
+      p.classList.toggle('active', p.getAttribute('data-panel') === tabName);
+    });
+    var slug = card.getAttribute('data-slug');
+    if (tabName === 'financieel') {
+      var bc = card.querySelector('.standpunt-begroting[data-slug="' + slug + '"]');
+      if (bc) loadBegroting(slug, bc);
+    }
+    if (tabName === 'discussie') {
+      var dc = card.querySelector('.discussie-container');
+      if (dc && dc.hidden) {
+        Discussie.load(dc, dc.getAttribute('data-disc-type'), dc.getAttribute('data-disc-slug'));
+        Discussie.bindEvents(dc);
+      }
+    }
+  }
+
+  // Event: accordion toggle, tabs, historie
   grid.addEventListener('click', function (e) {
     var toggleBtn = e.target.closest('.standpunt-toggle');
     if (toggleBtn) {
@@ -412,16 +449,13 @@
       toggleBtn.innerHTML = expanded
         ? '<i class="lucide lucide-chevron-down" aria-hidden="true"></i> Lees meer'
         : '<i class="lucide lucide-chevron-up" aria-hidden="true"></i> Sluiten';
-      if (!expanded) {
-        var slug = card.getAttribute('data-slug');
-        var begrotingContainer = body.querySelector('.standpunt-begroting[data-slug="' + slug + '"]');
-        if (begrotingContainer) loadBegroting(slug, begrotingContainer);
-        var discContainer = body.querySelector('.discussie-container');
-        if (discContainer && discContainer.hidden) {
-          Discussie.load(discContainer, discContainer.getAttribute('data-disc-type'), discContainer.getAttribute('data-disc-slug'));
-          Discussie.bindEvents(discContainer);
-        }
-      }
+      return;
+    }
+
+    var tabBtn = e.target.closest('.sp-tab');
+    if (tabBtn) {
+      var card = tabBtn.closest('.standpunt-card');
+      activateTab(card, tabBtn.getAttribute('data-tab'));
       return;
     }
 
@@ -457,13 +491,6 @@
       toggle.setAttribute('aria-expanded', 'true');
       body.hidden = false;
       toggle.innerHTML = '<i class="lucide lucide-chevron-up" aria-hidden="true"></i> Sluiten';
-      var begrotingContainer = body.querySelector('.standpunt-begroting[data-slug="' + slug + '"]');
-      if (begrotingContainer) loadBegroting(slug, begrotingContainer);
-      var discContainer = body.querySelector('.discussie-container');
-      if (discContainer && discContainer.hidden) {
-        Discussie.load(discContainer, discContainer.getAttribute('data-disc-type'), discContainer.getAttribute('data-disc-slug'));
-        Discussie.bindEvents(discContainer);
-      }
     }
     card.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }

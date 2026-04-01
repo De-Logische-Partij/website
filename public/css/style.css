@@ -1650,12 +1650,61 @@ footer a:hover { color: var(--text); }
 }
 
 .standpunt-body {
-  padding: 0 var(--space-lg) var(--space-lg);
+  padding: 0;
   border-top: 1px solid var(--border);
 }
 
-.standpunt-inhoud {
-  padding-top: var(--space-lg);
+/* Tabs */
+.sp-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sp-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: var(--space-sm) var(--space-md);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.sp-tab i {
+  font-size: 0.85rem;
+  font-style: normal;
+}
+
+.sp-tab:hover {
+  color: var(--text);
+}
+
+.sp-tab.active {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+.sp-panel {
+  display: none;
+  padding: var(--space-lg);
+}
+
+.sp-panel.active {
+  display: block;
+}
+
+.sp-footer {
+  padding: 0 var(--space-lg) var(--space-lg);
 }
 
 .standpunt-inhoud p {
@@ -1672,35 +1721,36 @@ footer a:hover { color: var(--text); }
 .standpunt-cijfers {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
   margin-top: var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface);
+  border-radius: var(--radius-md);
 }
 
 .cijfer-card {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: var(--space-md);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  min-width: 100px;
-  flex: 1;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: var(--space-xs) var(--space-sm);
 }
 
 .cijfer-waarde {
   font-family: var(--mono);
-  font-size: 1.3rem;
+  font-size: 0.92rem;
   font-weight: 700;
-  color: var(--text);
+  color: var(--accent-hover);
   line-height: 1.2;
 }
 
 .cijfer-label {
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  text-align: center;
-  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.cijfer-card + .cijfer-card {
+  border-left: 1px solid var(--border);
+  padding-left: var(--space-sm);
 }
 
 .standpunt-maatregelen {
@@ -1738,51 +1788,50 @@ footer a:hover { color: var(--text); }
   margin-top: 0.2rem;
 }
 
-.standpunt-juridisch {
-  margin-top: var(--space-lg);
-  background: #E3F2FD;
-  border: 1px solid #BBDEFB;
+.standpunt-juridisch,
+.standpunt-beperkingen {
+  margin-top: var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: var(--space-md);
+  border-left: 3px solid var(--border);
 }
 
-.standpunt-juridisch h4 {
+.sp-panel > .standpunt-juridisch:first-child,
+.sp-panel > .standpunt-beperkingen:first-child {
+  margin-top: 0;
+}
+
+.standpunt-juridisch {
+  border-left-color: #42A5F5;
+}
+
+.standpunt-beperkingen {
+  border-left-color: #FFA726;
+}
+
+.standpunt-juridisch h4,
+.standpunt-beperkingen h4 {
   display: flex;
   align-items: center;
   gap: 0.4rem;
   font-size: 0.82rem;
   font-weight: 700;
-  color: #1565C0;
+  color: var(--text);
   margin-bottom: var(--space-xs);
 }
 
-.standpunt-juridisch h4 i {
+.standpunt-juridisch h4 i,
+.standpunt-beperkingen h4 i {
   font-size: 0.9rem;
   font-style: normal;
 }
 
-.standpunt-juridisch p {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  line-height: 1.6;
-  margin: 0;
-}
+.standpunt-juridisch h4 i { color: #42A5F5; }
+.standpunt-beperkingen h4 i { color: #FFA726; }
 
-.standpunt-beperkingen {
-  margin-top: var(--space-lg);
-  background: #FFF3E0;
-  border: 1px solid #FFE0B2;
-  border-radius: var(--radius-md);
-  padding: var(--space-md);
-}
-
-.standpunt-beperkingen h4 {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: #E65100;
-  margin-bottom: var(--space-xs);
-}
-
+.standpunt-juridisch p,
 .standpunt-beperkingen p {
   font-size: 0.85rem;
   color: var(--text-secondary);
@@ -1791,13 +1840,13 @@ footer a:hover { color: var(--text); }
 }
 
 .standpunt-bronnen {
-  margin-top: var(--space-lg);
+  margin-top: var(--space-md);
 }
 
 .standpunt-bronnen h4 {
   font-size: 0.82rem;
   font-weight: 700;
-  color: var(--text-muted);
+  color: var(--text);
   margin-bottom: var(--space-sm);
 }
 
@@ -1836,8 +1885,8 @@ footer a:hover { color: var(--text); }
 }
 
 .standpunt-begroting-inner {
-  margin-top: var(--space-lg);
   border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
   border-radius: var(--radius-md);
   padding: var(--space-md);
   background: var(--surface);
@@ -1902,7 +1951,6 @@ footer a:hover { color: var(--text); }
   font-weight: 500;
   color: var(--text-muted);
   text-decoration: none;
-  margin-top: var(--space-md);
   transition: color 0.2s;
 }
 
@@ -1995,6 +2043,11 @@ footer a:hover { color: var(--text); }
 @media (max-width: 768px) {
   .standpunten-grid { grid-template-columns: 1fr; }
   .standpunten-callout { padding: var(--space-md); }
+  .sp-tab { padding: var(--space-xs) var(--space-sm); font-size: 0.75rem; }
+  .sp-tab i { display: none; }
+  .sp-panel { padding: var(--space-md); }
+  .cijfer-card { flex-direction: column; align-items: flex-start; gap: 0.15rem; }
+  .cijfer-card + .cijfer-card { border-left: none; border-top: 1px solid var(--border); padding-left: var(--space-sm); padding-top: var(--space-xs); }
 }
 
 /* ——— VRAGEN ——— */
@@ -2159,15 +2212,17 @@ footer a:hover { color: var(--text); }
 }
 
 .vraag-context {
-  padding: 0 var(--space-lg) var(--space-lg);
-  border-top: 1px solid var(--border);
+  margin: 0 var(--space-lg) var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  border-left: 2px solid var(--border);
 }
 
 .vraag-context p {
-  padding-top: var(--space-lg);
-  font-size: 0.92rem;
+  font-size: 0.85rem;
   color: var(--text-secondary);
-  line-height: 1.7;
+  line-height: 1.6;
   margin: 0;
 }
 
@@ -2201,7 +2256,7 @@ footer a:hover { color: var(--text); }
 
 .vraag-stem,
 .vraag-stem-resultaat {
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--space-sm) var(--space-lg);
   border-top: 1px solid var(--border);
 }
 
@@ -2215,8 +2270,8 @@ footer a:hover { color: var(--text); }
 .stem-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.5rem 1.2rem;
+  gap: 0.3rem;
+  padding: 0.4rem 1rem;
   border-radius: var(--radius-md);
   font-family: var(--font);
   font-size: 0.85rem;
@@ -2262,10 +2317,10 @@ footer a:hover { color: var(--text); }
 
 .stem-bar {
   display: flex;
-  height: 8px;
+  height: 6px;
   border-radius: 100px;
   overflow: hidden;
-  margin-bottom: var(--space-sm);
+  margin-bottom: var(--space-xs);
 }
 
 .stem-bar-eens {
@@ -2288,8 +2343,8 @@ footer a:hover { color: var(--text); }
 .stem-label-oneens {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  font-size: 0.82rem;
+  gap: 0.25rem;
+  font-size: 0.78rem;
   font-weight: 500;
   color: var(--text-secondary);
 }

@@ -110,7 +110,9 @@ if (standpuntenCount.n === 0) {
       "Ondernemers besteden tot 20% van hun tijd aan compliance: vergunningen aanvragen, rapportages invullen, regels naleven die niemand begrijpt. Dit remt innovatie en maakt ondernemen onnodig zwaar, vooral voor kleine bedrijven en zzp'ers.\n\nDLP wil ondernemers bevrijden van onnodige bureaucratie. Minder vergunningen, minder rapportageverplichtingen en geen verplichte zzp-verzekering. De overheid moet een faciliterende rol aannemen in plaats van een controlerende. Wie risico neemt en waarde creëert, verdient steun, geen papierwinkel.\n\nEen ondernemer moet kunnen ondernemen. Niet vergaderen met de overheid.",
       JSON.stringify(["Vrijheid", "Autonomie"]),
       null, null, null, null, null,
-      null, null, null, null
+      0.1, 0.5,
+      "Herziening vergunningenstelsel en digitalisering aanvraagprocessen.",
+      "Besparing handhavings- en uitvoeringskosten door minder vergunningen."
     );
 
     insertStandpunt.run(
@@ -121,7 +123,9 @@ if (standpuntenCount.n === 0) {
       "Het huidige onderwijssysteem stamt uit de industriele revolutie: iedereen dezelfde lesstof, hetzelfde tempo, dezelfde toetsen. Kinderen die anders denken, sneller leren of juist meer tijd nodig hebben, worden afgeremd of buitengesloten.\n\nDLP wil leerplicht vervangen door leerrecht. Ouders en kinderen krijgen de vrijheid om de onderwijsvorm te kiezen die bij hen past: regulier onderwijs, thuisonderwijs, versnellen, een eigen leerroute of een combinatie daarvan. Het systeem past zich aan het kind aan, niet andersom.\n\nDe overheid stelt kwaliteitskaders, maar schrijft niet voor hoe een kind moet leren. Talent verdient ruimte, niet een mal.",
       JSON.stringify(["Autonomie", "Vrijheid"]),
       null, null, null, null, null,
-      null, null, null, null
+      0.3, null,
+      "Kwaliteitstoezicht alternatieve onderwijsvormen en aanpassing examenstelsel.",
+      "Maatschappelijk rendement reeel maar manifesteert zich over decennia."
     );
 
     insertStandpunt.run(
@@ -149,7 +153,9 @@ if (standpuntenCount.n === 0) {
       "Zorgprofessionals besteden een groot deel van hun tijd aan administratie: indicaties, verantwoordingen, registraties en declaraties. Dit gaat ten koste van de daadwerkelijke zorg. Ondertussen lopen de wachtlijsten in de GGZ op tot onacceptabele niveaus.\n\nDLP wil het vertrouwen in de zorgprofessional herstellen. Minder indicatieverplichtingen, minder administratieve lasten en meer ruimte om te doen waar het om draait: zorgen voor mensen. De GGZ-wachtlijsten moeten gehalveerd worden door bureaucratische drempels weg te nemen en innovatieve zorgvormen mogelijk te maken.\n\nEen arts moet genezen. Niet administreren.",
       JSON.stringify(["Eenvoud", "Logica"]),
       null, null, null, null, null,
-      null, null, null, null
+      0.2, 1.5,
+      "Vereenvoudiging ICT-systemen en herinrichting administratieve processen.",
+      "Vermindering administratieve lasten; 10% tijdwinst bij zorgprofessionals is circa 1,5 mld."
     );
 
     insertStandpunt.run(
@@ -160,7 +166,9 @@ if (standpuntenCount.n === 0) {
       "Nederland heeft een woningtekort, maar bouwen duurt eindeloos. Vergunningtrajecten slepen zich maanden of jaren voort. Bezwaarprocedures vertragen projecten die al goedgekeurd zijn. Innovatieve woonvormen zoals tiny houses en zelfbouw stuiten op rigide bestemmingsplannen.\n\nDLP wil dat bouwvergunningen binnen 30 dagen worden afgehandeld. Bezwaarprocedures worden vereenvoudigd zodat ze niet langer als vertragingstactiek kunnen worden ingezet. Er komt ruimte voor alternatieve woonvormen: tiny houses, zelfbouw, modulair bouwen en andere creatieve oplossingen voor het woningtekort.\n\nWie wil bouwen, moet kunnen bouwen, zonder jarenlang te wachten op toestemming.",
       JSON.stringify(["Eenvoud", "Vrijheid"]),
       null, null, null, null, null,
-      null, null, null, null
+      0.2, 0.8,
+      "Hervorming vergunningstelsel en capaciteitsuitbreiding gemeenten.",
+      "Snellere procedures en economische baten door snellere woningbouw."
     );
 
     insertStandpunt.run(
@@ -171,7 +179,9 @@ if (standpuntenCount.n === 0) {
       "De huidige democratie is een vierjaarlijkse checkout: je stemt, en daarna heb je vier jaar lang geen directe invloed meer. Besluitvorming vindt plaats achter gesloten deuren en burgers voelen zich niet gehoord.\n\nDLP wil bindende referenda invoeren waarmee burgers direct invloed uitoefenen op belangrijke besluiten. AI-ondersteunde burgerparticipatie maakt het mogelijk om complexe wetsvoorstellen begrijpelijk samen te vatten en burgers geinformeerd mee te laten beslissen. Elke burger kan meedenken en meebeslissen, niet eens per vier jaar, maar doorlopend.\n\nDemocratie is geen eenmalige gebeurtenis. Het is een doorlopend gesprek.",
       JSON.stringify(["Logica", "Autonomie"]),
       null, null, null, null, null,
-      null, null, null, null
+      0.5, null,
+      "Digitaal referendumplatform en AI-participatietools, verspreid over twee jaar.",
+      "Democratische investering, niet in euro's uit te drukken."
     );
 
     insertStandpunt.run(
@@ -182,7 +192,9 @@ if (standpuntenCount.n === 0) {
       "De rijksbegroting is nu een onleesbaar PDF-moeras van duizenden pagina's. Niemand leest het, niemand begrijpt het, en dat is precies hoe het systeem het wil. DLP wil daar verandering in brengen.\n\nDLP pleit voor een real-time, interactief begrotingsdashboard waar iedere burger kan zien waar elke euro naartoe gaat. Machine-leesbaar, doorzoekbaar, met AI-uitleg in begrijpelijke taal. Elke overheidstransactie traceerbaar. Geen verborgen potjes, geen boekhoudkundige trucjes.\n\nTransparantie levert Nederland jaarlijks miljarden op. Het is geen kostenpost, het is een investering.",
       JSON.stringify(["Logica", "Eenvoud", "Vrijheid"]),
       null, null, null, null, null,
-      null, null, null, null
+      0.05, null,
+      "Interactief begrotingsdashboard en digitaal archief.",
+      "Waarde zit in transparantie en publieke controle."
     );
 
     insertStandpunt.run(
@@ -193,7 +205,9 @@ if (standpuntenCount.n === 0) {
       "Het huidige drugsbeleid is gebaseerd op moraal en angst, niet op wetenschap. Het criminaliseren van drugsgebruik leidt niet tot minder gebruik, maar wel tot meer criminaliteit, onveilige producten en overbelaste rechtbanken. Het gedoogbeleid creeert een grijs gebied waar niemand bij gebaat is.\n\nDLP pleit voor een evidence-based drugsbeleid: legalisering en regulering van drugs, met strenge kwaliteitseisen en leeftijdsgrenzen. Harm reduction staat centraal, niet straf, maar hulp. Volwassenen worden behandeld als volwassenen die zelf verantwoorde keuzes kunnen maken.\n\nDe war on drugs is mislukt. Het wordt tijd voor een logische aanpak.",
       JSON.stringify(["Logica", "Vrijheid"]),
       null, null, null, null, null,
-      null, null, null, null
+      0.3, 1.5,
+      "Reguleringsinfrastructuur: licenties, kwaliteitscontrole, preventie- en verslavingszorg.",
+      "Belastingopbrengsten legale verkoop (0,8-1,0 mld) plus besparing handhaving (0,5 mld)."
     );
 
     insertStandpunt.run(
@@ -204,7 +218,9 @@ if (standpuntenCount.n === 0) {
       "Het huidige energiebeleid pikt winnaars en verliezers: sommige technologieen worden gesubsidieerd, andere worden verboden of ontmoedigd. Dit leidt tot inefficientie, hogere energieprijzen en een rem op innovatie.\n\nDLP staat voor technologieneutraal energiebeleid. Of het nu gaat om zonne-energie, windenergie, kernenergie of een technologie die nog moet worden uitgevonden, de overheid kiest niet, de markt kiest. Burgers en bedrijven moeten vrij zijn om energie op te wekken, op te slaan en te verhandelen zonder onnodige beperkingen.\n\nEnergievrijheid betekent dat iedereen toegang heeft tot betaalbare, betrouwbare energie, ongeacht welke technologie dat levert.",
       JSON.stringify(["Vrijheid", "Autonomie"]),
       null, null, null, null, null,
-      null, null, null, null
+      0.0, 0.5,
+      "Voornamelijk deregulering, minimale directe kosten.",
+      "Afbouw technologie-specifieke subsidies, afhankelijk van uitwerking."
     );
 
     insertStandpunt.run(
@@ -215,7 +231,9 @@ if (standpuntenCount.n === 0) {
       "De digitale transformatie verdient een eigen plek aan de kabinettafel. Een minister die AI, robotica, digitale infrastructuur en cyberveiligheid als kernverantwoordelijkheid heeft. Technologie is de motor van onze economie en samenleving. Het verdient een minister die daar volledig voor staat, met een eigen begroting en mandaat. Geen bijzaak bij Economische Zaken, maar topprioriteit.",
       JSON.stringify(["Logica", "Eenvoud"]),
       null, null, null, null, null,
-      null, null, null, null
+      0.3, 1.2,
+      "Nieuw ministerie: personeel, huisvesting en AI-expertisecentrum.",
+      "Efficientiewinst door AI in overheidsdiensten, oplopend over zes jaar."
     );
 
     insertStandpunt.run(
@@ -226,7 +244,9 @@ if (standpuntenCount.n === 0) {
       "Nederland heeft de kennis, de infrastructuur en het talent om de tech-hub van Europa te worden. Dat vereist een beter investeringsklimaat: meer zekerheid voor durfkapitalisten, betere programma's voor startups in de groeifase, en fiscale prikkels die innovatie belonen. We willen Nederlandse AI-modellen, Nederlandse softwareplatformen die kunnen concurreren met Google en Meta, en datacenters die onze digitale soevereiniteit waarborgen. De overheid faciliteert dit met regelgeving die innovatie versnelt, niet vertraagt. Met gerichte R&D-investeringen en door barrières voor scale-ups weg te nemen.",
       JSON.stringify(["Autonomie", "Logica", "Vrijheid"]),
       null, null, null, null, null,
-      null, null, null, null
+      2.0, null,
+      "Jaarlijks innovatiefonds voor startup-klimaat en R&D.",
+      "Extra belastingopbrengsten via BBP-groei, niet als directe opbrengst te boeken."
     );
 
     insertStandpunt.run(
@@ -237,7 +257,9 @@ if (standpuntenCount.n === 0) {
       "Verschil van mening is gezond. Maar verdeeldheid schaadt. DLP gelooft in het zoeken naar common ground tussen verschillende perspectieven. Wij geven ruimte aan andersdenkenden, aan ieders geloof en afkomst, en aan de dialoog die nodig is om samen vooruit te komen. Respect voor elkaar is de basis van een sterke samenleving. Dat betekent luisteren, begrijpen, en samen zoeken naar oplossingen die voor iedereen werken.",
       JSON.stringify(["Autonomie", "Vrijheid"]),
       null, null, null, null, null,
-      null, null, null, null
+      0.1, null,
+      "Buurtprogramma's, dialooginitiatieven, maatschappelijke organisaties.",
+      "Sociale cohesie heeft maatschappelijk rendement maar is niet kwantificeerbaar."
     );
 
     insertStandpunt.run(
@@ -248,7 +270,9 @@ if (standpuntenCount.n === 0) {
       "Straffen alleen lost niets op. De oorzaken van criminaliteit liggen vaak in armoede, uitzichtloosheid en gebrek aan kansen. DLP wil investeren in preventie: betere omstandigheden, toegang tot onderwijs en werk, en sterke sociale vangnetten. Mensen die in de fout zijn gegaan verdienen een eerlijke weg terug de samenleving in. Met begeleiding, omscholing en werk voorkomen we terugval. Decriminalisering waar dat logisch is, en een rechtssysteem dat gericht is op herstel in plaats van alleen vergelding. Zo bouwen we aan een veiligere samenleving voor iedereen.",
       JSON.stringify(["Autonomie", "Logica", "Vrijheid"]),
       null, null, null, null, null,
-      null, null, null, null
+      0.8, 0.5,
+      "Preventie: wijkprogramma's, re-integratie, omscholing, sociale vangnetten.",
+      "Besparing detentie en justitiele keten door lagere recidive, opbouwend over 5-10 jaar."
     );
 
     insertStandpunt.run(
@@ -266,6 +290,36 @@ if (standpuntenCount.n === 0) {
       3, 5,
       "Kwijtschelding corona-belastingschulden: directe kosten van gedeeltelijke kwijtschelding op basis van draagkracht. Geschat op circa 3 miljard euro (niet alle schuld wordt kwijtgescholden).",
       "Behoud werkgelegenheid en toekomstige belastingopbrengsten: ondernemers die weer op de been komen creeren banen en betalen belasting. Geschat netto-effect circa 5 miljard euro over 10 jaar."
+    );
+
+    insertStandpunt.run(
+      "open-politiek",
+      "Open politiek: iedereen kan meekijken",
+      "Transparantie",
+      "Een verplicht lobbyregister, publieke notulen en een doorzoekbaar vergaderarchief naar Estlands model. Burgers kunnen bij de bron meekijken hoe besluiten tot stand komen.",
+      "Veel politieke vergaderingen zijn niet publiek toegankelijk. Notulen verschijnen laat of onvolledig. De Wet open overheid (Woo) verplicht al tot actieve openbaarmaking, maar de implementatie loopt achter. DLP wil dat de standaardinstelling van politiek \"open\" is. Concreet: een wettelijk verplicht lobbyregister naar het voorbeeld van de EU en Ierland. Een getrapt notulensysteem: besluitenlijsten binnen 24 uur, volledige verslagen binnen zeven werkdagen, en livestreams die direct worden gearchiveerd. Open zakelijke agenda's voor ministers en Kamerleden, met AVG-waarborgen. En een doorzoekbaar digitaal vergaderarchief naar het model van het Estlandse Dokumendiregister, gekoppeld aan De Glazen Begroting. Vergaderingen over nationale veiligheid blijven vertrouwelijk, mits onderbouwd en achteraf getoetst. DLP gaat zelf voorop.",
+      JSON.stringify(["Transparantie", "Logica", "Autonomie"]),
+      null,
+      JSON.stringify(["Wettelijk verplicht lobbyregister (model EU/Ierland)", "Getrapt notulensysteem: besluitenlijst 24u, volledig verslag 7 werkdagen", "Open zakelijke agenda's met AVG-waarborgen", "Doorzoekbaar digitaal vergaderarchief (model Estlands Dokumendiregister)"]),
+      null, null, null,
+      0.1, null,
+      "Eenmalig circa 100 mln voor infrastructuur, 20 mln per jaar onderhoud. Overlapt grotendeels met investering digitaal referendumplatform.",
+      null
+    );
+
+    insertStandpunt.run(
+      "veilig-thuis",
+      "Veilig thuis",
+      "Veiligheid",
+      "Jaarlijks worden meer dan 200.000 Nederlanders slachtoffer van huiselijk geweld en worden circa 30 vrouwen vermoord door een (ex-)partner. DLP investeert in vroegsignalering, snellere opvang en daderaanpak.",
+      "Veiligheid begint niet bij de straf, maar bij de bescherming. Elk jaar worden meer dan 200.000 Nederlanders slachtoffer van huiselijk geweld. Circa 30 vrouwen worden vermoord door een (ex-)partner. De maatschappelijke kosten bedragen meer dan vier miljard euro per jaar. DLP wil investeren in wat aantoonbaar werkt. Meer capaciteit bij Veilig Thuis en de vrouwenopvang. Betere training van politie en hulpverleners. Strengere handhaving van contact- en huisverboden met elektronisch toezicht. En uitbreiding van de mogelijkheden voor rechters om daderbehandeling op te leggen.",
+      JSON.stringify(["Vrijheid", "Logica", "Autonomie"]),
+      null,
+      JSON.stringify(["Meer capaciteit en kortere wachttijden Veilig Thuis en vrouwenopvang", "Training politie en hulpverleners in dwangcontrole en escalatierisico", "Strengere handhaving contact- en huisverboden met elektronisch toezicht", "Uitbreiding rechterlijke mogelijkheden voor daderbehandeling"]),
+      null, null, null,
+      0.4, 0.3,
+      "Uitbreiding capaciteit Veilig Thuis en vrouwenopvang, training politie/hulpverleners, elektronisch toezicht, daderbehandeling.",
+      "Besparing op justitie, zorg en uitkeringen door minder recidive. WODC schat maatschappelijke kosten huiselijk geweld op 4+ mld per jaar, 10% reductie levert 0,3-0,4 mld op."
     );
   });
 

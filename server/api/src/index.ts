@@ -36,6 +36,6 @@ app.route("/api/admin/begroting", adminBegroting);
 app.use("/*", serveStatic({ root: "../../public" }));
 
 export default {
-  port: 3001,
+  port: parseInt(process.env.PORT ?? "3001", 10),
   fetch: app.fetch,
 };
