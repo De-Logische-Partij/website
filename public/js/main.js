@@ -79,17 +79,16 @@
   if (financeBody) {
     var API_BASE = '/api';
 
-    function formatEuro(cents) {
-      var abs = Math.abs(cents);
-      var euros = Math.floor(abs / 100);
-      var rest = String(abs % 100).padStart(2, '0');
-      var sign = cents < 0 ? '-' : '';
-      return sign + '\u20AC' + euros.toLocaleString('nl-NL') + ',' + rest;
+    function formatEurFromString(eurStr) {
+      var num = parseFloat(eurStr);
+      var sign = num < 0 ? '-' : '';
+      var abs = Math.abs(num);
+      return sign + '\u20AC' + abs.toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
     function renderRows(items) {
       if (!items.length) {
-        financeBody.innerHTML = '<tr><td colspan="5" class="table-status">Nog geen transacties.</td></tr>';
+        financeBody.innerHTML = '<tr><td colspan="6" class="table-status">Nog geen transacties.</td></tr>';
         return;
       }
       financeBody.innerHTML = items.map(function (item) {
@@ -97,21 +96,29 @@
         var badgeClass = isExpense ? 'badge--expense' : 'badge--income';
         var badgeLabel = isExpense ? 'Uitgave' : 'Inkomst';
         var amountClass = 'col-amount' + (isExpense ? ' expense' : ' income');
+        var receiptCell = '';
+        if (item.receipt_url) {
+          var hashTag = item.receipt_hash
+            ? '<span class="receipt-hash">' + item.receipt_hash.substring(0, 8) + '</span>'
+            : '';
+          receiptCell = '<a href="' + item.receipt_url + '" class="receipt-link" target="_blank" rel="noopener">Factuur</a>' + hashTag;
+        }
         return '<tr>' +
-          '<td>' + item.datum + '</td>' +
+          '<td>' + item.date + '</td>' +
           '<td><span class="badge ' + badgeClass + '">' + badgeLabel + '</span></td>' +
-          '<td>' + item.categorie + '</td>' +
-          '<td>' + item.omschrijving + '</td>' +
-          '<td class="' + amountClass + '">' + formatEuro(item.bedrag) + '</td>' +
+          '<td>' + item.category + '</td>' +
+          '<td>' + item.description + '</td>' +
+          '<td class="' + amountClass + '">' + formatEurFromString(item.amount_eur) + '</td>' +
+          '<td class="col-receipt">' + receiptCell + '</td>' +
           '</tr>';
       }).join('');
     }
 
     fetch(API_BASE + '/financien')
       .then(function (res) { return res.json(); })
-      .then(function (data) { renderRows(data); })
+      .then(function (data) { renderRows(data.transacties || []); })
       .catch(function () {
-        financeBody.innerHTML = '<tr><td colspan="5" class="table-status">Kan gegevens niet laden. Probeer het later opnieuw.</td></tr>';
+        financeBody.innerHTML = '<tr><td colspan="6" class="table-status">Kan gegevens niet laden. Probeer het later opnieuw.</td></tr>';
       });
 
     var summaryIncome = document.getElementById('summary-income');
@@ -121,10 +128,10 @@
     fetch(API_BASE + '/financien/samenvatting')
       .then(function (res) { return res.json(); })
       .then(function (data) {
-        summaryIncome.textContent = formatEuro(data.totaal_inkomsten);
-        summaryExpenses.textContent = formatEuro(data.totaal_uitgaven);
-        summaryBalance.textContent = formatEuro(data.saldo);
-        summaryBalance.classList.add(data.saldo >= 0 ? 'income' : 'expense');
+        summaryIncome.textContent = formatEurFromString(data.totaal_inkomsten_eur);
+        summaryExpenses.textContent = formatEurFromString(data.totaal_uitgaven_eur);
+        summaryBalance.textContent = formatEurFromString(data.saldo_eur);
+        summaryBalance.classList.add(parseFloat(data.saldo_eur) >= 0 ? 'income' : 'expense');
       })
       .catch(function () {
         summaryIncome.textContent = '--';
