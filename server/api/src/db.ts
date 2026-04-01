@@ -161,9 +161,109 @@ if (standpuntenCount.n === 0) {
       "Het huidige energiebeleid pikt winnaars en verliezers: sommige technologieen worden gesubsidieerd, andere worden verboden of ontmoedigd. Dit leidt tot inefficientie, hogere energieprijzen en een rem op innovatie.\n\nDLP staat voor technologieneutraal energiebeleid. Of het nu gaat om zonne-energie, windenergie, kernenergie of een technologie die nog moet worden uitgevonden, de overheid kiest niet, de markt kiest. Burgers en bedrijven moeten vrij zijn om energie op te wekken, op te slaan en te verhandelen zonder onnodige beperkingen.\n\nEnergievrijheid betekent dat iedereen toegang heeft tot betaalbare, betrouwbare energie, ongeacht welke technologie dat levert.",
       JSON.stringify(["Vrijheid", "Autonomie"])
     );
+
+    insertStandpunt.run(
+      "minister-ai-technologie",
+      "Minister van AI en Technologie",
+      "Digitaal",
+      "De digitale transformatie verdient een eigen plek aan de kabinettafel.",
+      "De digitale transformatie verdient een eigen plek aan de kabinettafel. Een minister die AI, robotica, digitale infrastructuur en cyberveiligheid als kernverantwoordelijkheid heeft. Technologie is de motor van onze economie en samenleving. Het verdient een minister die daar volledig voor staat, met een eigen begroting en mandaat. Geen bijzaak bij Economische Zaken, maar topprioriteit.",
+      JSON.stringify(["Logica", "Eenvoud"])
+    );
+
+    insertStandpunt.run(
+      "nederland-tech-hub",
+      "Nederland als tech-hub van Europa",
+      "Economie",
+      "Een investeringsklimaat waarin startups floreren en Nederlandse tech-bedrijven wereldwijd meespelen.",
+      "Nederland heeft de kennis, de infrastructuur en het talent om de tech-hub van Europa te worden. Dat vereist een beter investeringsklimaat: meer zekerheid voor durfkapitalisten, betere programma's voor startups in de groeifase, en fiscale prikkels die innovatie belonen. We willen Nederlandse AI-modellen, Nederlandse softwareplatformen die kunnen concurreren met Google en Meta, en datacenters die onze digitale soevereiniteit waarborgen. De overheid faciliteert dit met regelgeving die innovatie versnelt, niet vertraagt. Met gerichte R&D-investeringen en door barrières voor scale-ups weg te nemen.",
+      JSON.stringify(["Autonomie", "Logica", "Vrijheid"])
+    );
+
+    insertStandpunt.run(
+      "verbinding-en-respect",
+      "Verbinding in een verdeelde tijd",
+      "Samenleving",
+      "In een tijd van verdeeldheid zoeken wij naar wat ons verbindt, met respect voor elke achtergrond en overtuiging.",
+      "Verschil van mening is gezond. Maar verdeeldheid schaadt. DLP gelooft in het zoeken naar common ground tussen verschillende perspectieven. Wij geven ruimte aan andersdenkenden, aan ieders geloof en afkomst, en aan de dialoog die nodig is om samen vooruit te komen. Respect voor elkaar is de basis van een sterke samenleving. Dat betekent luisteren, begrijpen, en samen zoeken naar oplossingen die voor iedereen werken.",
+      JSON.stringify(["Autonomie", "Vrijheid"])
+    );
+
+    insertStandpunt.run(
+      "criminaliteit-bij-de-bron",
+      "Criminaliteit bij de bron aanpakken",
+      "Samenleving",
+      "Investeren in de omstandigheden die criminaliteit veroorzaken, en mensen na een fout een eerlijke weg terug bieden.",
+      "Straffen alleen lost niets op. De oorzaken van criminaliteit liggen vaak in armoede, uitzichtloosheid en gebrek aan kansen. DLP wil investeren in preventie: betere omstandigheden, toegang tot onderwijs en werk, en sterke sociale vangnetten. Mensen die in de fout zijn gegaan verdienen een eerlijke weg terug de samenleving in. Met begeleiding, omscholing en werk voorkomen we terugval. Decriminalisering waar dat logisch is, en een rechtssysteem dat gericht is op herstel in plaats van alleen vergelding. Zo bouwen we aan een veiligere samenleving voor iedereen.",
+      JSON.stringify(["Autonomie", "Logica", "Vrijheid"])
+    );
   });
 
   seedStandpunten();
+}
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS vragen (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    slug TEXT NOT NULL UNIQUE,
+    titel TEXT NOT NULL,
+    type TEXT NOT NULL CHECK(type IN ('kamervraag', 'burgervraag', 'open')),
+    context TEXT NOT NULL,
+    vraag TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open', 'beantwoord', 'gesloten')),
+    antwoord TEXT,
+    antwoord_datum TEXT,
+    stemmen_eens INTEGER DEFAULT 0,
+    stemmen_oneens INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+  )
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS vragen_stemmen (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ip_slug_hash TEXT NOT NULL UNIQUE,
+    vraag_id INTEGER NOT NULL,
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (vraag_id) REFERENCES vragen(id)
+  )
+`);
+
+const vragenCount = db.query("SELECT COUNT(*) as n FROM vragen").get() as { n: number };
+
+if (vragenCount.n === 0) {
+  const insertVraag = db.prepare(
+    "INSERT INTO vragen (slug, titel, type, context, vraag) VALUES (?, ?, ?, ?, ?)"
+  );
+
+  const seedVragen = db.transaction(() => {
+    insertVraag.run(
+      "minister-van-technologie",
+      "Waarom heeft Nederland nog geen Minister van Technologie?",
+      "kamervraag",
+      "Nederland loopt achter in de digitale transformatie. Andere landen hebben al een dedicated minister of staatssecretaris voor digitale zaken. Ondertussen valt technologiebeleid in Nederland onder Economische Zaken, waar het concurreert met tientallen andere dossiers om aandacht en budget.",
+      "Waarom heeft Nederland nog geen Minister van Technologie, terwijl AI, cyberveiligheid en digitale infrastructuur steeds bepalender worden voor onze economie en veiligheid?"
+    );
+
+    insertVraag.run(
+      "investeren-in-nederlandse-ai",
+      "Moet de overheid investeren in Nederlandse AI-modellen?",
+      "burgervraag",
+      "Nederland is voor AI-technologie vrijwel volledig afhankelijk van Amerikaanse techbedrijven zoals Google, Microsoft en OpenAI. Dit betekent dat onze data, onze taal en onze waarden worden verwerkt door systemen waar we geen controle over hebben. Een eigen Nederlands of Europees AI-model zou digitale soevereiniteit versterken, maar vereist forse publieke investeringen.",
+      "Moet de Nederlandse overheid investeren in de ontwikkeling van eigen AI-modellen, of laten we dit over aan de markt?"
+    );
+
+    insertVraag.run(
+      "belastingaangifte-begrijpelijk",
+      "Hoe maken we de belastingaangifte begrijpelijk voor iedereen?",
+      "open",
+      "Elk jaar worstelen miljoenen Nederlanders met hun belastingaangifte. Het formulier is complex, de terminologie is ondoorgrondelijk, en fouten leiden tot boetes of misgelopen toeslagen. Dit raakt vooral mensen met een laag inkomen of beperkte digitale vaardigheden het hardst.",
+      "Hoe kunnen we de belastingaangifte zo vereenvoudigen dat iedere Nederlander het zonder hulp kan invullen?"
+    );
+  });
+
+  seedVragen();
 }
 
 const FACTUUR_5884_HASH = "16b5df41a611cd90450ab1c57382b809936f75ff50f92bf4cb21462c4a5e3fae";

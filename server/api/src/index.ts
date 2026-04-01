@@ -5,6 +5,7 @@ import financien from "./routes/financien";
 import aanmelden from "./routes/aanmelden";
 import supporters from "./routes/supporters";
 import { standpunten, adminStandpunten } from "./routes/standpunten";
+import { vragen, adminVragen } from "./routes/vragen";
 
 const app = new Hono();
 
@@ -20,6 +21,8 @@ app.route("/api/aanmelden", aanmelden);
 app.route("/api/supporters", supporters);
 app.route("/api/standpunten", standpunten);
 app.route("/api/admin/standpunten", adminStandpunten);
+app.route("/api/vragen", vragen);
+app.route("/api/admin/vragen", adminVragen);
 
 app.use("/*", serveStatic({ root: "../../public" }));
 

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#FAFAF8">
+<title>Vragen | De Logische Partij</title>
+<meta name="description" content="Vragen die DLP stelt aan de politiek, en vragen waarop wij graag jouw mening horen. Stem mee en denk mee.">
+<link rel="canonical" href="https://delogischepartij.nl/vragen/">
+
+<!-- Open Graph -->
+<meta property="og:title" content="Vragen | De Logische Partij">
+<meta property="og:description" content="Vragen die DLP stelt aan de politiek, en vragen waarop wij graag jouw mening horen.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://delogischepartij.nl/vragen/">
+<meta property="og:locale" content="nl_NL">
+<meta property="og:site_name" content="De Logische Partij">
+<meta property="og:image" content="https://delogischepartij.nl/images/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="De Logische Partij | Het kan logischer.">
+
+<link rel="stylesheet" href="https://unpkg.com/lucide-static@latest/font/lucide.css">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Spring naar inhoud</a>
+
+<nav aria-label="Hoofdnavigatie">
+  <a href="/" class="nav-logo"><span class="mark">DLP</span> De Logische Partij</a>
+  <button class="nav-toggle" aria-label="Menu openen" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-links">
+    <a href="/#probleem">Probleem</a>
+    <a href="/#programma">Programma</a>
+    <a href="/standpunten/">Standpunten</a>
+    <a href="/vragen/">Vragen</a>
+    <a href="/#visie">Visie</a>
+    <a href="/#steun" class="nav-cta">Steun DLP</a>
+  </div>
+</nav>
+
+<main id="main-content">
+  <section class="hero hero--short">
+    <div class="hero-content">
+      <div class="hero-tag">Vragen</div>
+      <h1>Onze vragen</h1>
+      <p class="hero-sub">Vragen die wij stellen aan de politiek, en vragen waarop wij graag jouw mening horen.</p>
+    </div>
+  </section>
+
+  <section class="vragen-section" id="vragen">
+    <div class="section-inner">
+      <div class="vragen-filters">
+        <div class="vragen-filter-group" role="group" aria-label="Filter op type">
+          <span class="filter-label">Type</span>
+          <div class="vragen-filter-buttons" id="vragen-type-filters">
+            <button class="filter-btn active" data-type="alle">Alle</button>
+            <button class="filter-btn" data-type="kamervraag">Kamervragen</button>
+            <button class="filter-btn" data-type="burgervraag">Burgervragen</button>
+            <button class="filter-btn" data-type="open">Open vragen</button>
+          </div>
+        </div>
+        <div class="vragen-filter-group" role="group" aria-label="Filter op status">
+          <span class="filter-label">Status</span>
+          <div class="vragen-filter-buttons" id="vragen-status-filters">
+            <button class="filter-btn active" data-status="alle">Alle</button>
+            <button class="filter-btn" data-status="open">Open</button>
+            <button class="filter-btn" data-status="beantwoord">Beantwoord</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="vragen-list" id="vragen-list">
+        <p class="vragen-loading" id="vragen-loading">Vragen worden geladen...</p>
+      </div>
+
+      <p class="vragen-empty" id="vragen-empty" hidden>Geen vragen gevonden voor deze filters.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>&copy; 2026 De Logische Partij (DLP)</span>
+  <span><a href="/">Home</a> · <a href="/standpunten/">Standpunten</a> · <a href="/vragen/">Vragen</a> · <a href="/transparantie/">Transparantie</a> · <a href="mailto:steun@delogischepartij.nl">Contact</a></span>
+</footer>
+
+<div class="cookie-banner" id="cookie-banner" hidden>
+  <p>Deze site plaatst geen tracking cookies en verzamelt geen persoonsgegevens.</p>
+  <button class="cookie-btn" id="cookie-dismiss" onclick="this.parentElement.hidden=true;try{localStorage.setItem('cookie-dismissed','1')}catch(e){}">Begrepen</button>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+(function () {
+  var API = '/api';
+  var list = document.getElementById('vragen-list');
+  var loading = document.getElementById('vragen-loading');
+  var emptyMsg = document.getElementById('vragen-empty');
+  var typeFilters = document.getElementById('vragen-type-filters');
+  var statusFilters = document.getElementById('vragen-status-filters');
+
+  var allVragen = [];
+  var activeType = 'alle';
+  var activeStatus = 'alle';
+
+  var typeConfig = {
+    kamervraag:  { label: 'Kamervraag',  cssClass: 'badge--kamervraag' },
+    burgervraag: { label: 'Burgervraag', cssClass: 'badge--burgervraag' },
+    open:        { label: 'Open vraag',  cssClass: 'badge--openvraag' }
+  };
+
+  var statusLabels = {
+    open:        { label: 'Open',        cssClass: 'badge--status-open' },
+    beantwoord:  { label: 'Beantwoord',  cssClass: 'badge--status-beantwoord' },
+    gesloten:    { label: 'Gesloten',    cssClass: 'badge--status-gesloten' }
+  };
+
+  function hasVoted(slug) {
+    try { return localStorage.getItem('vraag-stem-' + slug); } catch (e) { return null; }
+  }
+
+  function saveVote(slug, stem) {
+    try { localStorage.setItem('vraag-stem-' + slug, stem); } catch (e) {}
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function escapeAttr(str) {
+    return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+  }
+
+  function loadVragen() {
+    fetch(API + '/vragen')
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        allVragen = Array.isArray(data) ? data : (data.vragen || []);
+        renderList();
+      })
+      .catch(function () {
+        loading.textContent = 'Kan vragen niet laden. Probeer het later opnieuw.';
+      });
+  }
+
+  function renderList() {
+    var filtered = allVragen.filter(function (v) {
+      var matchType = activeType === 'alle' || v.type === activeType;
+      var matchStatus = activeStatus === 'alle' || v.status === activeStatus;
+      return matchType && matchStatus;
+    });
+
+    if (!allVragen.length) return;
+
+    if (!filtered.length) {
+      list.innerHTML = '';
+      emptyMsg.hidden = false;
+      return;
+    }
+
+    emptyMsg.hidden = true;
+    list.innerHTML = filtered.map(function (v) {
+      var tc = typeConfig[v.type] || typeConfig.open;
+      var sc = statusLabels[v.status] || statusLabels.open;
+      var voted = hasVoted(v.slug);
+      var isBurger = v.type === 'burgervraag';
+      var isBeantwoord = v.status === 'beantwoord';
+
+      var stemHtml = '';
+      if (isBurger) {
+        var eens = v.stemmen_eens || 0;
+        var oneens = v.stemmen_oneens || 0;
+        var totaal = eens + oneens;
+        var pctEens = totaal > 0 ? Math.round((eens / totaal) * 100) : 50;
+        var pctOneens = 100 - pctEens;
+
+        if (voted) {
+          stemHtml = '<div class="vraag-stem-resultaat">' +
+            '<div class="stem-bar">' +
+              '<div class="stem-bar-eens" style="width:' + pctEens + '%"></div>' +
+              '<div class="stem-bar-oneens" style="width:' + pctOneens + '%"></div>' +
+            '</div>' +
+            '<div class="stem-labels">' +
+              '<span class="stem-label-eens' + (voted === 'eens' ? ' stem-voted' : '') + '"><i class="lucide lucide-thumbs-up" aria-hidden="true"></i> Eens ' + pctEens + '%</span>' +
+              '<span class="stem-label-oneens' + (voted === 'oneens' ? ' stem-voted' : '') + '"><i class="lucide lucide-thumbs-down" aria-hidden="true"></i> Oneens ' + pctOneens + '%</span>' +
+            '</div>' +
+            '<span class="stem-totaal">' + totaal + ' stemmen</span>' +
+          '</div>';
+        } else {
+          stemHtml = '<div class="vraag-stem" data-slug="' + escapeAttr(v.slug) + '">' +
+            '<button class="stem-btn stem-btn--eens" data-stem="eens"><i class="lucide lucide-thumbs-up" aria-hidden="true"></i> Eens</button>' +
+            '<button class="stem-btn stem-btn--oneens" data-stem="oneens"><i class="lucide lucide-thumbs-down" aria-hidden="true"></i> Oneens</button>' +
+            (totaal > 0 ? '<span class="stem-totaal">' + totaal + ' stemmen</span>' : '') +
+          '</div>';
+        }
+      }
+
+      var antwoordHtml = '';
+      if (isBeantwoord && v.antwoord) {
+        antwoordHtml = '<div class="vraag-antwoord">' +
+          '<strong><i class="lucide lucide-message-square" aria-hidden="true"></i> Antwoord</strong>' +
+          '<p>' + escapeHtml(v.antwoord) + '</p>' +
+        '</div>';
+      }
+
+      return '<div class="vraag-card" data-slug="' + escapeAttr(v.slug) + '">' +
+        '<div class="vraag-header">' +
+          '<div class="vraag-badges">' +
+            '<span class="badge ' + tc.cssClass + '">' + escapeHtml(tc.label) + '</span>' +
+            '<span class="badge ' + sc.cssClass + '">' + escapeHtml(sc.label) + '</span>' +
+          '</div>' +
+          '<h3>' + escapeHtml(v.titel) + '</h3>' +
+          (v.context ? '<button class="vraag-context-toggle" aria-expanded="false"><i class="lucide lucide-chevron-down" aria-hidden="true"></i> Context</button>' : '') +
+        '</div>' +
+        (v.context ? '<div class="vraag-context" hidden><p>' + escapeHtml(v.context) + '</p></div>' : '') +
+        antwoordHtml +
+        stemHtml +
+      '</div>';
+    }).join('');
+  }
+
+  // Type filter
+  typeFilters.addEventListener('click', function (e) {
+    var btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    typeFilters.querySelectorAll('.filter-btn').forEach(function (b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    activeType = btn.getAttribute('data-type');
+    renderList();
+  });
+
+  // Status filter
+  statusFilters.addEventListener('click', function (e) {
+    var btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    statusFilters.querySelectorAll('.filter-btn').forEach(function (b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    activeStatus = btn.getAttribute('data-status');
+    renderList();
+  });
+
+  // Context toggle + Stemmen
+  list.addEventListener('click', function (e) {
+    var ctxBtn = e.target.closest('.vraag-context-toggle');
+    if (ctxBtn) {
+      var card = ctxBtn.closest('.vraag-card');
+      var ctx = card.querySelector('.vraag-context');
+      var expanded = ctxBtn.getAttribute('aria-expanded') === 'true';
+      ctxBtn.setAttribute('aria-expanded', String(!expanded));
+      ctx.hidden = expanded;
+      ctxBtn.innerHTML = expanded
+        ? '<i class="lucide lucide-chevron-down" aria-hidden="true"></i> Context'
+        : '<i class="lucide lucide-chevron-up" aria-hidden="true"></i> Verberg context';
+      return;
+    }
+
+    var stemBtn = e.target.closest('.stem-btn');
+    if (stemBtn) {
+      var stemWrap = stemBtn.closest('.vraag-stem');
+      var slug = stemWrap.getAttribute('data-slug');
+      var stem = stemBtn.getAttribute('data-stem');
+      var buttons = stemWrap.querySelectorAll('.stem-btn');
+      buttons.forEach(function (b) { b.disabled = true; });
+      stemBtn.textContent = 'Bezig...';
+
+      fetch(API + '/vragen/' + encodeURIComponent(slug) + '/stem', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stem: stem })
+      })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          saveVote(slug, stem);
+          var vraag = allVragen.find(function (v) { return v.slug === slug; });
+          if (vraag) {
+            vraag.stemmen_eens = data.stemmen_eens || vraag.stemmen_eens || 0;
+            vraag.stemmen_oneens = data.stemmen_oneens || vraag.stemmen_oneens || 0;
+            if (stem === 'eens') vraag.stemmen_eens = Math.max(vraag.stemmen_eens, (vraag.stemmen_eens || 0));
+            if (stem === 'oneens') vraag.stemmen_oneens = Math.max(vraag.stemmen_oneens, (vraag.stemmen_oneens || 0));
+          }
+          renderList();
+        })
+        .catch(function () {
+          buttons.forEach(function (b) { b.disabled = false; });
+          stemBtn.innerHTML = stem === 'eens'
+            ? '<i class="lucide lucide-thumbs-up" aria-hidden="true"></i> Eens'
+            : '<i class="lucide lucide-thumbs-down" aria-hidden="true"></i> Oneens';
+        });
+    }
+  });
+
+  loadVragen();
+})();
+</script>
+</body>
+</html>

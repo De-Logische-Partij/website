@@ -36,6 +36,7 @@
     <a href="/#probleem">Probleem</a>
     <a href="/#programma">Programma</a>
     <a href="/standpunten/">Standpunten</a>
+    <a href="/vragen/">Vragen</a>
     <a href="/#visie">Visie</a>
     <a href="/#steun" class="nav-cta">Steun DLP</a>
   </div>
@@ -63,15 +64,21 @@
           <label for="standpunten-zoek" class="sr-only">Zoek standpunten</label>
           <input type="search" id="standpunten-zoek" placeholder="Zoek standpunten..." autocomplete="off">
         </div>
-        <div class="standpunten-categories" id="standpunten-categories" role="group" aria-label="Filter op categorie">
-          <button class="cat-btn active" data-category="alle">Alle</button>
+        <div class="filter-group">
+          <span class="filter-label">Categorie</span>
+          <div class="standpunten-categories" id="standpunten-categories" role="group" aria-label="Filter op categorie">
+            <button class="cat-btn active" data-category="alle">Alle</button>
+          </div>
         </div>
-        <div class="standpunten-statuses" id="standpunten-statuses" role="group" aria-label="Filter op status">
-          <button class="status-btn active" data-status="alle">Alle</button>
+        <div class="filter-group">
+          <span class="filter-label">Status</span>
+          <div class="standpunten-statuses" id="standpunten-statuses" role="group" aria-label="Filter op status">
+            <button class="status-btn active" data-status="alle">Alle</button>
           <button class="status-btn" data-status="programma">In programma</button>
           <button class="status-btn" data-status="concept">Concept</button>
           <button class="status-btn" data-status="gewijzigd">Gewijzigd</button>
           <button class="status-btn" data-status="ingetrokken">Ingetrokken</button>
+          </div>
         </div>
       </div>
 
