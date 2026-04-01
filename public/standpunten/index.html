@@ -121,7 +121,7 @@
   var statusConfig = {
     concept:        { label: 'Concept',        cssClass: 'badge--concept' },
     programma:      { label: 'In programma',   cssClass: 'badge--programma' },
-    gewijzigd:      { label: 'Gewijzigd',      cssClass: 'badge--gewijzigd' },
+    gewijzigd:      { label: 'In programma',   cssClass: 'badge--programma' },
     gerectificeerd: { label: 'Gerectificeerd', cssClass: 'badge--gerectificeerd' },
     ingetrokken:    { label: 'Ingetrokken',    cssClass: 'badge--ingetrokken' }
   };
@@ -202,6 +202,11 @@
         '</div>';
       }
 
+      var wijzigingHtml = '';
+      if (s.updated_at && s.created_at && s.updated_at !== s.created_at) {
+        wijzigingHtml = '<span class="standpunt-wijziging-datum">Laatste wijziging: ' + escapeHtml(s.updated_at) + '</span>';
+      }
+
       return '<div class="' + cardClass + '" data-slug="' + escapeAttr(s.slug) + '">' +
         '<div class="standpunt-header">' +
           '<div class="standpunt-badges">' +
@@ -210,7 +215,7 @@
           '</div>' +
           titelHtml +
           '<p>' + escapeHtml(s.samenvatting || '') + '</p>' +
-          (isGewijzigd ? '<span class="standpunt-gewijzigd-hint"><i class="lucide lucide-arrow-down-circle" aria-hidden="true"></i> Bekijk de wijzigingsgeschiedenis voor de vorige versie</span>' : '') +
+          wijzigingHtml +
           extraContent +
           '<button class="standpunt-toggle" aria-expanded="false">' +
             '<i class="lucide lucide-chevron-down" aria-hidden="true"></i> Lees meer' +
