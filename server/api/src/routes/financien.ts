@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import db from "../db";
+import { fetchBitcoinData, type BitcoinTransaction } from "../bitcoin";
 
 interface Transaction {
   id: number;
@@ -19,9 +20,25 @@ interface Summary {
   saldo: number;
 }
 
+function btcTxToTransactionRow(tx: BitcoinTransaction) {
+  return {
+    id: null,
+    date: tx.datum,
+    type: "inkomst",
+    category: "Bitcoin donatie",
+    description: `BTC donatie (${tx.bedrag_btc} BTC)`,
+    amount_cents: null,
+    amount_btc: tx.bedrag_btc,
+    amount_satoshis: tx.bedrag_satoshis,
+    receipt_hash: tx.txid,
+    receipt_url: tx.blockchain_url,
+    created_at: tx.datum,
+  };
+}
+
 const financien = new Hono();
 
-financien.get("/", (c) => {
+financien.get("/", async (c) => {
   const rows = db.query("SELECT * FROM transactions ORDER BY date DESC, id DESC").all() as Transaction[];
 
   const formatted = rows.map((row) => ({
@@ -29,10 +46,13 @@ financien.get("/", (c) => {
     amount_eur: (row.amount_cents / 100).toFixed(2),
   }));
 
-  return c.json({ transacties: formatted });
+  const btcData = await fetchBitcoinData();
+  const btcRows = btcData.transacties.map(btcTxToTransactionRow);
+
+  return c.json({ transacties: [...btcRows, ...formatted] });
 });
 
-financien.get("/samenvatting", (c) => {
+financien.get("/samenvatting", async (c) => {
   const row = db
     .query(
       `SELECT
@@ -43,23 +63,39 @@ financien.get("/samenvatting", (c) => {
     )
     .get() as Summary;
 
+  const btcData = await fetchBitcoinData();
+
   return c.json({
     totaal_inkomsten_eur: (row.total_inkomsten / 100).toFixed(2),
     totaal_uitgaven_eur: (Math.abs(row.total_uitgaven) / 100).toFixed(2),
     saldo_eur: (row.saldo / 100).toFixed(2),
+    bitcoin_balans_btc: btcData.balans_btc,
   });
 });
 
-financien.get("/export.csv", (c) => {
+financien.get("/bitcoin", async (c) => {
+  const data = await fetchBitcoinData();
+  return c.json(data);
+});
+
+financien.get("/export.csv", async (c) => {
   const rows = db.query("SELECT * FROM transactions ORDER BY date DESC, id DESC").all() as Transaction[];
 
-  const header = "datum,type,categorie,omschrijving,bedrag_eur,bewijsstuk_hash,bewijsstuk_url";
-  const lines = rows.map(
+  const btcData = await fetchBitcoinData();
+
+  const header = "datum,type,categorie,omschrijving,bedrag_eur,bedrag_btc,bewijsstuk_hash,bewijsstuk_url";
+
+  const eurLines = rows.map(
     (row) =>
-      `${row.date},${row.type},${row.category},"${row.description}",${(row.amount_cents / 100).toFixed(2)},${row.receipt_hash ?? ""},${row.receipt_url ?? ""}`
+      `${row.date},${row.type},${row.category},"${row.description}",${(row.amount_cents / 100).toFixed(2)},,${row.receipt_hash ?? ""},${row.receipt_url ?? ""}`
   );
 
-  const csv = [header, ...lines].join("\n");
+  const btcLines = btcData.transacties.map(
+    (tx) =>
+      `${tx.datum},inkomst,Bitcoin donatie,"BTC donatie (${tx.bedrag_btc} BTC)",,${tx.bedrag_btc},${tx.txid},${tx.blockchain_url}`
+  );
+
+  const csv = [header, ...btcLines, ...eurLines].join("\n");
 
   c.header("Content-Type", "text/csv; charset=utf-8");
   c.header("Content-Disposition", 'attachment; filename="financien-dlp.csv"');

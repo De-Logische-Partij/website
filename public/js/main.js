@@ -39,41 +39,107 @@
     }
   });
 
-  // Signup form — inline feedback instead of alert
+  // Signup form
   var form = document.getElementById('signup-form');
   if (form) {
     var submitting = false;
+    var input = document.getElementById('email-input');
+    var btn = form.querySelector('button[type="submit"]');
+    var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    function showFeedback(text, isError) {
+      var existing = form.parentNode.querySelector('.form-feedback');
+      if (existing) existing.remove();
+
+      var msg = document.createElement('p');
+      msg.className = 'form-feedback' + (isError ? ' form-feedback--error' : '');
+      msg.textContent = text;
+      form.parentNode.insertBefore(msg, form.nextSibling);
+
+      setTimeout(function () {
+        msg.classList.add('fade-out');
+        msg.addEventListener('transitionend', function () { msg.remove(); });
+      }, 4000);
+    }
+
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       if (submitting) return;
-      var input = document.getElementById('email-input');
       var email = input.value.trim();
-      if (!email) return;
+      if (!email || !emailPattern.test(email)) {
+        showFeedback('Vul een geldig e-mailadres in.', true);
+        return;
+      }
 
       submitting = true;
-      var btn = form.querySelector('button[type="submit"]');
       btn.disabled = true;
       btn.textContent = 'Bezig...';
 
-      // Simulate a submission (replace with real endpoint later)
-      setTimeout(function () {
-        input.value = '';
-        submitting = false;
-        btn.disabled = false;
-        btn.textContent = 'Aanmelden';
-
-        var msg = document.createElement('p');
-        msg.className = 'form-feedback';
-        msg.textContent = 'Bedankt! Je bent aangemeld.';
-        form.parentNode.insertBefore(msg, form.nextSibling);
-
-        setTimeout(function () {
-          msg.classList.add('fade-out');
-          msg.addEventListener('transitionend', function () { msg.remove(); });
-        }, 4000);
-      }, 600);
+      fetch('/api/aanmelden', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email })
+      })
+        .then(function (res) {
+          if (!res.ok) throw new Error(res.status);
+          input.value = '';
+          showFeedback('Bedankt! Je bent aangemeld.', false);
+          loadSupportersCount();
+        })
+        .catch(function () {
+          showFeedback('Er ging iets mis. Probeer het later opnieuw.', true);
+        })
+        .finally(function () {
+          submitting = false;
+          btn.disabled = false;
+          btn.textContent = 'Aanmelden';
+        });
     });
   }
+
+  // Supporters count
+  var countEl = document.getElementById('supporters-count');
+  function loadSupportersCount() {
+    if (!countEl) return;
+    fetch('/api/supporters/count')
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (data.count > 0) {
+          countEl.textContent = 'Al ' + data.count + ' mensen doen mee.';
+          countEl.hidden = false;
+        }
+      })
+      .catch(function () {});
+  }
+  loadSupportersCount();
+
+  // Copy to clipboard (donate BTC address)
+  var copyBtn = document.getElementById('btn-copy-btc');
+  var btcAddress = document.getElementById('btc-address');
+  if (copyBtn && btcAddress) {
+    copyBtn.addEventListener('click', function () {
+      navigator.clipboard.writeText(btcAddress.textContent).then(function () {
+        copyBtn.innerHTML = '<i class="lucide lucide-check" aria-hidden="true"></i>';
+        setTimeout(function () {
+          copyBtn.innerHTML = '<i class="lucide lucide-copy" aria-hidden="true"></i>';
+        }, 2000);
+      });
+    });
+  }
+
+  // Cookie banner
+  var banner = document.getElementById('cookie-banner');
+  var dismissBtn = document.getElementById('cookie-dismiss');
+  if (banner && dismissBtn) {
+    if (!localStorage.getItem('cookie-dismissed')) {
+      banner.hidden = false;
+    }
+    dismissBtn.addEventListener('click', function () {
+      banner.hidden = true;
+      localStorage.setItem('cookie-dismissed', '1');
+    });
+  }
+
   // Finance table (transparantie page)
   var financeBody = document.getElementById('finance-data');
   if (financeBody) {
@@ -98,10 +164,12 @@
         var amountClass = 'col-amount' + (isExpense ? ' expense' : ' income');
         var receiptCell = '';
         if (item.receipt_url) {
+          var isBlockchain = item.receipt_url.indexOf('blockstream.info') !== -1;
+          var linkLabel = isBlockchain ? 'Blockchain' : 'Factuur';
           var hashTag = item.receipt_hash
             ? '<span class="receipt-hash">' + item.receipt_hash.substring(0, 8) + '</span>'
             : '';
-          receiptCell = '<a href="' + item.receipt_url + '" class="receipt-link" target="_blank" rel="noopener">Factuur</a>' + hashTag;
+          receiptCell = '<a href="' + item.receipt_url + '" class="receipt-link" target="_blank" rel="noopener">' + linkLabel + '</a>' + hashTag;
         }
         return '<tr>' +
           '<td>' + item.date + '</td>' +
@@ -132,6 +200,15 @@
         summaryExpenses.textContent = formatEurFromString(data.totaal_uitgaven_eur);
         summaryBalance.textContent = formatEurFromString(data.saldo_eur);
         summaryBalance.classList.add(parseFloat(data.saldo_eur) >= 0 ? 'income' : 'expense');
+
+        if (data.bitcoin_balans_btc && data.bitcoin_balans_btc !== '0.00000000') {
+          var btcCard = document.getElementById('summary-btc-card');
+          var btcValue = document.getElementById('summary-btc');
+          if (btcCard && btcValue) {
+            btcValue.textContent = data.bitcoin_balans_btc + ' BTC';
+            btcCard.hidden = false;
+          }
+        }
       })
       .catch(function () {
         summaryIncome.textContent = '--';

@@ -2,6 +2,8 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { serveStatic } from "hono/bun";
 import financien from "./routes/financien";
+import aanmelden from "./routes/aanmelden";
+import supporters from "./routes/supporters";
 
 const app = new Hono();
 
@@ -13,6 +15,8 @@ app.use(
 );
 
 app.route("/api/financien", financien);
+app.route("/api/aanmelden", aanmelden);
+app.route("/api/supporters", supporters);
 
 app.use("/*", serveStatic({ root: "../../public" }));
 

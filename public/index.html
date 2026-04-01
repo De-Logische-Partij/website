@@ -203,12 +203,70 @@
     <cite>— De Logische Partij</cite>
   </section>
 
+  <section class="founder">
+    <div class="section-inner founder-grid">
+      <div class="founder-photo">
+        <img src="/images/joris-slagter.jpg" alt="Joris Slagter, oprichter De Logische Partij" loading="lazy">
+      </div>
+      <div class="founder-content">
+        <div class="section-label">Oprichter</div>
+        <h2 class="section-title">Joris Slagter</h2>
+        <p class="founder-text">Ondernemer en technoloog uit Zevenhuizen (Groningen). Opgericht vanuit de overtuiging dat politiek logischer, transparanter en efficienter kan.</p>
+        <a href="mailto:steun@delogischepartij.nl" class="founder-link"><i class="lucide lucide-mail" aria-hidden="true"></i> Neem contact op</a>
+      </div>
+    </div>
+  </section>
+
   <div class="values">
     <div class="value"><span class="value-sym" aria-hidden="true">◇</span><h4>Autonomie</h4><p>Mensen kunnen zelf kiezen.</p></div>
     <div class="value"><span class="value-sym" aria-hidden="true">△</span><h4>Eenvoud</h4><p>Regels die iedereen begrijpt.</p></div>
     <div class="value"><span class="value-sym" aria-hidden="true">○</span><h4>Logica</h4><p>Beleid op bewijs, niet emotie.</p></div>
     <div class="value"><span class="value-sym" aria-hidden="true">□</span><h4>Vrijheid</h4><p>Rechten beschermen, niet sturen.</p></div>
   </div>
+
+  <section class="volunteer" id="vrijwilliger">
+    <div class="section-inner">
+      <div class="section-label">Meedoen</div>
+      <h2 class="section-title">Word vrijwilliger</h2>
+      <p class="section-desc">DLP wordt gebouwd door mensen die geloven dat het logischer kan. Of je nu kunt helpen met technologie, communicatie, juridisch of gewoon meedenken: elke bijdrage telt.</p>
+      <div class="volunteer-grid">
+        <div class="volunteer-card">
+          <i class="lucide lucide-code volunteer-icon" aria-hidden="true"></i>
+          <h3>Technologie</h3>
+          <p>Help mee bouwen aan onze digitale infrastructuur, van de website tot tools voor directe democratie.</p>
+        </div>
+        <div class="volunteer-card">
+          <i class="lucide lucide-megaphone volunteer-icon" aria-hidden="true"></i>
+          <h3>Communicatie</h3>
+          <p>Schrijf mee aan teksten, social media of campagnemateriaal. Breng de boodschap helder over.</p>
+        </div>
+        <div class="volunteer-card">
+          <i class="lucide lucide-search volunteer-icon" aria-hidden="true"></i>
+          <h3>Onderzoek</h3>
+          <p>Onderbouw onze standpunten met data en feiten. Help ons beleid evidence-based te houden.</p>
+        </div>
+        <div class="volunteer-card">
+          <i class="lucide lucide-message-circle volunteer-icon" aria-hidden="true"></i>
+          <h3>Meedenken</h3>
+          <p>Denk mee over strategie, standpunten en de toekomst van DLP. Elke stem telt.</p>
+        </div>
+      </div>
+      <a href="mailto:steun@delogischepartij.nl" class="btn-primary">Neem contact op</a>
+    </div>
+  </section>
+
+  <section class="donate" id="doneren">
+    <div class="section-inner">
+      <div class="section-label">Steun</div>
+      <h2 class="section-title">Steun DLP</h2>
+      <p class="section-desc">DLP is volledig onafhankelijk en wordt gefinancierd door supporters. Je kunt bijdragen via Bitcoin.</p>
+      <div class="donate-address">
+        <code id="btc-address">bc1q905urh523ly6snup6mwvjmkllhupuxkmmd8a6t</code>
+        <button class="btn-copy" id="btn-copy-btc" aria-label="Kopieer Bitcoin adres"><i class="lucide lucide-copy" aria-hidden="true"></i></button>
+      </div>
+      <p class="donate-note">Elke donatie wordt publiek verantwoord op onze <a href="/transparantie/">transparantiepagina</a>.</p>
+    </div>
+  </section>
 
   <section class="cta" id="steun">
     <h2>Doe mee. Denk mee.</h2>
@@ -218,13 +276,19 @@
       <input type="email" id="email-input" placeholder="jouw@email.nl" required autocomplete="email">
       <button type="submit">Aanmelden</button>
     </form>
+    <p class="supporters-count" id="supporters-count" hidden></p>
   </section>
 </main>
 
 <footer>
   <span>&copy; 2026 De Logische Partij (DLP)</span>
-  <span><a href="/transparantie/">Transparantie</a> · <a href="/transparantie/">Privacy</a> · <a href="mailto:info@delogischepartij.nl">Contact</a> · <a href="#programma">Programma</a></span>
+  <span><a href="/transparantie/">Transparantie</a> · <a href="/transparantie/">Privacy</a> · <a href="mailto:steun@delogischepartij.nl">Contact</a> · <a href="#programma">Programma</a></span>
 </footer>
+
+<div class="cookie-banner" id="cookie-banner" hidden>
+  <p>Deze site gebruikt geen tracking cookies. We gebruiken Plausible Analytics, dat volledig privacy-vriendelijk is en geen cookies plaatst.</p>
+  <button class="cookie-btn" id="cookie-dismiss">Begrepen</button>
+</div>
 
 <script src="/js/main.js"></script>
 </body>
