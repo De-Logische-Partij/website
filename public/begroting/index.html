@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#FAFAF8">
+<title>De Glazen Begroting | De Logische Partij</title>
+<meta name="description" content="De Rijksbegroting, open en begrijpelijk. Elke euro, elk ministerie, elk artikel. Transparantie als standaard.">
+<link rel="canonical" href="https://delogischepartij.nl/begroting/">
+
+<!-- Open Graph -->
+<meta property="og:title" content="De Glazen Begroting | De Logische Partij">
+<meta property="og:description" content="De Rijksbegroting, open en begrijpelijk. Elke euro, elk ministerie, elk artikel.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://delogischepartij.nl/begroting/">
+<meta property="og:locale" content="nl_NL">
+<meta property="og:site_name" content="De Logische Partij">
+<meta property="og:image" content="https://delogischepartij.nl/images/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="De Logische Partij | Het kan logischer.">
+
+<link rel="stylesheet" href="https://unpkg.com/lucide-static@latest/font/lucide.css">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Spring naar inhoud</a>
+
+<nav aria-label="Hoofdnavigatie">
+  <a href="/" class="nav-logo"><span class="mark">DLP</span> De Logische Partij</a>
+  <button class="nav-toggle" aria-label="Menu openen" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-links">
+    <a href="/begroting/">Begroting</a>
+    <a href="/#programma">Programma</a>
+    <a href="/standpunten/">Standpunten</a>
+    <a href="/vragen/">Vragen</a>
+    <a href="/#visie">Visie</a>
+    <a href="/#steun" class="nav-cta">Steun DLP</a>
+  </div>
+</nav>
+
+<main id="main-content">
+  <section class="hero hero--short">
+    <div class="hero-content">
+      <div class="hero-tag">Transparantie</div>
+      <h1>De Glazen Begroting</h1>
+      <p class="hero-sub">De Rijksbegroting, open en begrijpelijk. Elke euro, elk ministerie, elk artikel.</p>
+    </div>
+  </section>
+
+  <section class="begroting-section" id="begroting">
+    <div class="section-inner">
+
+      <div class="begroting-jaar-selector" id="jaar-selector" role="group" aria-label="Selecteer jaar">
+        <button class="jaar-btn" data-jaar="2018">2018</button>
+        <button class="jaar-btn" data-jaar="2019">2019</button>
+        <button class="jaar-btn" data-jaar="2020">2020</button>
+        <button class="jaar-btn" data-jaar="2021">2021</button>
+        <button class="jaar-btn" data-jaar="2022">2022</button>
+        <button class="jaar-btn" data-jaar="2023">2023</button>
+        <button class="jaar-btn" data-jaar="2024">2024</button>
+        <button class="jaar-btn" data-jaar="2025">2025</button>
+        <button class="jaar-btn active" data-jaar="2026">2026</button>
+      </div>
+
+      <div class="begroting-totaal" id="begroting-totaal">
+        <div class="begroting-totaal-bedrag" id="totaal-bedrag">Laden...</div>
+        <div class="begroting-totaal-sub" id="totaal-sub"></div>
+      </div>
+
+      <div class="begroting-chart" id="begroting-chart">
+        <p class="begroting-laden" id="begroting-laden">Begrotingsdata wordt geladen...</p>
+      </div>
+
+      <div class="begroting-detail" id="begroting-detail" hidden></div>
+
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>&copy; 2026 De Logische Partij (DLP)</span>
+  <span><a href="/">Home</a> · <a href="/begroting/">Begroting</a> · <a href="/standpunten/">Standpunten</a> · <a href="/transparantie/">Transparantie</a> · <a href="/inzenden/">Denk mee</a> · <a href="mailto:steun@delogischepartij.nl">Contact</a></span>
+</footer>
+
+<div class="cookie-banner" id="cookie-banner" hidden>
+  <p>Deze site plaatst geen tracking cookies en verzamelt geen persoonsgegevens.</p>
+  <button class="cookie-btn" id="cookie-dismiss" onclick="this.parentElement.hidden=true;try{localStorage.setItem('cookie-dismissed','1')}catch(e){}">Begrepen</button>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+(function () {
+  var API = '/api/begroting';
+  var chart = document.getElementById('begroting-chart');
+  var laden = document.getElementById('begroting-laden');
+  var totaalBedrag = document.getElementById('totaal-bedrag');
+  var totaalSub = document.getElementById('totaal-sub');
+  var detail = document.getElementById('begroting-detail');
+  var jaarSelector = document.getElementById('jaar-selector');
+
+  var huidigJaar = 2026;
+  var data = null;
+
+  function formatBedrag(duizenden) {
+    var euro = duizenden * 1000;
+    var abs = Math.abs(euro);
+    if (abs >= 1e9) {
+      var mld = euro / 1e9;
+      return '\u20AC' + mld.toLocaleString('nl-NL', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' mld';
+    }
+    if (abs >= 1e6) {
+      var mln = Math.round(euro / 1e6);
+      return '\u20AC' + mln.toLocaleString('nl-NL') + ' mln';
+    }
+    return '\u20AC' + euro.toLocaleString('nl-NL');
+  }
+
+  function formatBedragGroot(duizenden) {
+    var euro = duizenden * 1000;
+    var abs = Math.abs(euro);
+    if (abs >= 1e9) {
+      var mld = euro / 1e9;
+      return '\u20AC' + mld.toLocaleString('nl-NL', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' miljard';
+    }
+    return '\u20AC' + Math.round(euro / 1e6).toLocaleString('nl-NL') + ' miljoen';
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  function escapeAttr(str) {
+    return (str || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+  }
+
+  function loadJaar(jaar) {
+    huidigJaar = jaar;
+    totaalBedrag.textContent = 'Laden...';
+    totaalSub.textContent = '';
+    chart.innerHTML = '<p class="begroting-laden">Begrotingsdata wordt geladen...</p>';
+    detail.hidden = true;
+
+    jaarSelector.querySelectorAll('.jaar-btn').forEach(function (b) {
+      b.classList.toggle('active', b.getAttribute('data-jaar') === String(jaar));
+    });
+
+    fetch(API + '/' + jaar)
+      .then(function (res) { return res.json(); })
+      .then(function (d) {
+        data = d;
+        renderOverzicht(d);
+      })
+      .catch(function () {
+        totaalBedrag.textContent = '--';
+        chart.innerHTML = '<p class="begroting-laden">Kan begrotingsdata niet laden. Probeer het later opnieuw.</p>';
+      });
+  }
+
+  function renderOverzicht(d) {
+    var hoofdstukken = d.hoofdstukken || [];
+    var totaal = d.totaal_uitgaven_duizend_euro || d.totaal_uitgaven || 0;
+
+    totaalBedrag.textContent = formatBedragGroot(totaal);
+    totaalSub.textContent = 'totale rijksuitgaven ' + d.jaar + ' (' + (d.fase || '') + '), verdeeld over ' + hoofdstukken.length + ' begrotingshoofdstukken';
+
+    var sorted = hoofdstukken.slice().sort(function (a, b) { return (b.uitgaven_duizend_euro || b.totaal || 0) - (a.uitgaven_duizend_euro || a.totaal || 0); });
+    var max = sorted.length ? (sorted[0].uitgaven_duizend_euro || sorted[0].totaal || 1) : 1;
+
+    chart.innerHTML = sorted.map(function (h) {
+      var bedrag = h.uitgaven_duizend_euro || h.totaal || 0;
+      var nr = h.hoofdstuk_nummer || h.hoofdstuk_nr || '';
+      var naam = h.naam || h.hoofdstuk_naam || '';
+      var pct = max > 0 ? Math.max((bedrag / max) * 100, 1) : 1;
+      return '<div class="begroting-bar-row" data-hoofdstuk="' + escapeAttr(nr) + '">' +
+        '<div class="begroting-bar-label">' +
+          '<span class="begroting-bar-nr">' + escapeHtml(nr) + '</span>' +
+          '<span class="begroting-bar-naam">' + escapeHtml(naam) + '</span>' +
+        '</div>' +
+        '<div class="begroting-bar-track">' +
+          '<div class="begroting-bar-fill" style="width:' + pct + '%"></div>' +
+        '</div>' +
+        '<span class="begroting-bar-bedrag">' + formatBedrag(bedrag) + '</span>' +
+      '</div>';
+    }).join('');
+  }
+
+  function loadDetail(hoofdstukNr) {
+    detail.hidden = false;
+    detail.innerHTML = '<p class="begroting-laden">Detail laden...</p>';
+    detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    var h = (data.hoofdstukken || []).find(function (x) { return (x.hoofdstuk_nummer || x.hoofdstuk_nr) === hoofdstukNr; });
+    var naam = h ? (h.naam || h.hoofdstuk_naam) : hoofdstukNr;
+
+    fetch(API + '/' + huidigJaar + '/' + encodeURIComponent(hoofdstukNr))
+      .then(function (res) { return res.json(); })
+      .then(function (d) {
+        var artikelen = d.artikelen || d.onderdelen || [];
+        var sorted = artikelen.slice().sort(function (a, b) { return (b.uitgaven || b.totaal || 0) - (a.uitgaven || a.totaal || 0); });
+        var max = sorted.length ? (sorted[0].uitgaven || sorted[0].totaal || 1) : 1;
+
+        detail.innerHTML = '<div class="begroting-detail-header">' +
+            '<button class="begroting-detail-close" id="detail-close"><i class="lucide lucide-x" aria-hidden="true"></i> Sluiten</button>' +
+            '<h3><span class="begroting-bar-nr">' + escapeHtml(hoofdstukNr) + '</span> ' + escapeHtml(naam) + '</h3>' +
+          '</div>' +
+          '<div class="begroting-detail-bars">' +
+            (sorted.length ? sorted.map(function (a) {
+              var bedrag = a.uitgaven || a.totaal || 0;
+              var pct = max > 0 ? Math.max((bedrag / max) * 100, 1) : 1;
+              return '<div class="begroting-bar-row begroting-bar-row--detail">' +
+                '<div class="begroting-bar-label">' +
+                  (a.artikel_nr ? '<span class="begroting-bar-nr">' + escapeHtml(a.artikel_nr) + '</span>' : '') +
+                  '<span class="begroting-bar-naam">' + escapeHtml(a.naam || a.artikel_naam || '') + '</span>' +
+                '</div>' +
+                '<div class="begroting-bar-track">' +
+                  '<div class="begroting-bar-fill begroting-bar-fill--detail" style="width:' + pct + '%"></div>' +
+                '</div>' +
+                '<span class="begroting-bar-bedrag">' + formatBedrag(bedrag) + '</span>' +
+              '</div>';
+            }).join('') : '<p class="begroting-laden">Geen artikelen beschikbaar.</p>') +
+          '</div>';
+      })
+      .catch(function () {
+        detail.innerHTML = '<p class="begroting-laden">Kan detail niet laden.</p>';
+      });
+  }
+
+  // Jaar selector
+  jaarSelector.addEventListener('click', function (e) {
+    var btn = e.target.closest('.jaar-btn');
+    if (!btn) return;
+    loadJaar(parseInt(btn.getAttribute('data-jaar'), 10));
+  });
+
+  // Bar click
+  chart.addEventListener('click', function (e) {
+    var row = e.target.closest('.begroting-bar-row');
+    if (!row) return;
+    var nr = row.getAttribute('data-hoofdstuk');
+    if (nr) loadDetail(nr);
+  });
+
+  // Detail close
+  detail.addEventListener('click', function (e) {
+    if (e.target.closest('.begroting-detail-close')) {
+      detail.hidden = true;
+    }
+  });
+
+  loadJaar(2026);
+})();
+</script>
+</body>
+</html>

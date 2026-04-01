@@ -33,7 +33,7 @@
     <span></span><span></span><span></span>
   </button>
   <div class="nav-links">
-    <a href="/#probleem">Probleem</a>
+    <a href="/begroting/">Begroting</a>
     <a href="/#programma">Programma</a>
     <a href="/standpunten/">Standpunten</a>
     <a href="/vragen/">Vragen</a>
@@ -180,7 +180,7 @@
         var pctEens = totaal > 0 ? Math.round((eens / totaal) * 100) : 50;
         var pctOneens = 100 - pctEens;
 
-        if (voted) {
+        if (voted && totaal > 0) {
           stemHtml = '<div class="vraag-stem-resultaat">' +
             '<div class="stem-bar">' +
               '<div class="stem-bar-eens" style="width:' + pctEens + '%"></div>' +
@@ -191,6 +191,10 @@
               '<span class="stem-label-oneens' + (voted === 'oneens' ? ' stem-voted' : '') + '"><i class="lucide lucide-thumbs-down" aria-hidden="true"></i> Oneens ' + pctOneens + '%</span>' +
             '</div>' +
             '<span class="stem-totaal">' + totaal + ' stemmen</span>' +
+          '</div>';
+        } else if (voted && totaal === 0) {
+          stemHtml = '<div class="vraag-stem-resultaat">' +
+            '<span class="stem-totaal">Nog geen stemmen</span>' +
           '</div>';
         } else {
           stemHtml = '<div class="vraag-stem" data-slug="' + escapeAttr(v.slug) + '">' +

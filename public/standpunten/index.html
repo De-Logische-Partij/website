@@ -33,7 +33,7 @@
     <span></span><span></span><span></span>
   </button>
   <div class="nav-links">
-    <a href="/#probleem">Probleem</a>
+    <a href="/begroting/">Begroting</a>
     <a href="/#programma">Programma</a>
     <a href="/standpunten/">Standpunten</a>
     <a href="/vragen/">Vragen</a>
@@ -217,6 +217,11 @@
         '</div>' +
         '<div class="standpunt-body" hidden>' +
           '<div class="standpunt-inhoud">' + formatInhoud(s.inhoud || s.samenvatting || '') + '</div>' +
+          renderCijfers(s.cijfers) +
+          renderMaatregelen(s.maatregelen) +
+          renderJuridisch(s.juridisch) +
+          renderBeperkingen(s.beperkingen) +
+          renderBronnen(s.bronnen) +
           '<button class="standpunt-historie-btn" data-slug="' + escapeAttr(s.slug) + '">' +
             '<i class="lucide lucide-history" aria-hidden="true"></i> Wijzigingsgeschiedenis' +
           '</button>' +
@@ -231,6 +236,64 @@
     return text.split(/\n\n+/).map(function (p) {
       return '<p>' + escapeHtml(p.trim()) + '</p>';
     }).join('');
+  }
+
+  function renderCijfers(cijfers) {
+    if (!cijfers || !cijfers.length) return '';
+    return '<div class="standpunt-cijfers">' +
+      cijfers.map(function (c) {
+        return '<div class="cijfer-card">' +
+          '<span class="cijfer-waarde">' + escapeHtml(c.waarde || c.getal || '') + '</span>' +
+          '<span class="cijfer-label">' + escapeHtml(c.label || c.omschrijving || '') + '</span>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+  }
+
+  function renderMaatregelen(maatregelen) {
+    if (!maatregelen || !maatregelen.length) return '';
+    return '<div class="standpunt-maatregelen">' +
+      '<h4>Concrete maatregelen</h4>' +
+      '<ol class="maatregelen-lijst">' +
+        maatregelen.map(function (m) {
+          var tekst = typeof m === 'string' ? m : (m.tekst || m.maatregel || '');
+          return '<li><i class="lucide lucide-check-circle" aria-hidden="true"></i> ' + escapeHtml(tekst) + '</li>';
+        }).join('') +
+      '</ol>' +
+    '</div>';
+  }
+
+  function renderJuridisch(juridisch) {
+    if (!juridisch) return '';
+    return '<div class="standpunt-juridisch">' +
+      '<h4><i class="lucide lucide-scale" aria-hidden="true"></i> Juridische haalbaarheid</h4>' +
+      '<p>' + escapeHtml(juridisch) + '</p>' +
+    '</div>';
+  }
+
+  function renderBeperkingen(beperkingen) {
+    if (!beperkingen) return '';
+    return '<div class="standpunt-beperkingen">' +
+      '<h4>Eerlijk over beperkingen</h4>' +
+      '<p>' + escapeHtml(beperkingen) + '</p>' +
+    '</div>';
+  }
+
+  function renderBronnen(bronnen) {
+    if (!bronnen || !bronnen.length) return '';
+    return '<div class="standpunt-bronnen">' +
+      '<h4>Bronnen</h4>' +
+      '<ul class="bronnen-lijst">' +
+        bronnen.map(function (b) {
+          var titel = escapeHtml(b.titel || b.url || '');
+          var datum = b.datum ? ' <span class="bron-datum">(' + escapeHtml(b.datum) + ')</span>' : '';
+          if (b.url) {
+            return '<li><a href="' + escapeAttr(b.url) + '" target="_blank" rel="noopener">' + titel + ' <i class="lucide lucide-external-link" aria-hidden="true"></i></a>' + datum + '</li>';
+          }
+          return '<li>' + titel + datum + '</li>';
+        }).join('') +
+      '</ul>' +
+    '</div>';
   }
 
   function escapeHtml(str) {

@@ -16,6 +16,11 @@ interface Standpunt {
   status: Status;
   rectificatie_tekst: string | null;
   intrekking_reden: string | null;
+  cijfers: string | null;
+  maatregelen: string | null;
+  juridisch: string | null;
+  beperkingen: string | null;
+  bronnen: string | null;
   versie: number;
   created_at: string;
   updated_at: string;
@@ -49,12 +54,12 @@ function requireApiKey(c: any, next: any) {
   return next();
 }
 
-function parseKernwaarden(kw: string | null): string[] {
-  if (!kw) return [];
+function parseJsonArray(val: string | null): any[] | null {
+  if (!val) return null;
   try {
-    return JSON.parse(kw);
+    return JSON.parse(val);
   } catch {
-    return [];
+    return null;
   }
 }
 
@@ -66,10 +71,15 @@ function formatStandpunt(row: Standpunt) {
     categorie: row.categorie,
     samenvatting: row.samenvatting,
     inhoud: row.inhoud,
-    kernwaarden: parseKernwaarden(row.kernwaarden),
+    kernwaarden: parseJsonArray(row.kernwaarden) ?? [],
     status: row.status,
     rectificatie_tekst: row.rectificatie_tekst,
     intrekking_reden: row.intrekking_reden,
+    cijfers: parseJsonArray(row.cijfers),
+    maatregelen: parseJsonArray(row.maatregelen),
+    juridisch: row.juridisch,
+    beperkingen: row.beperkingen,
+    bronnen: parseJsonArray(row.bronnen),
     versie: row.versie,
     created_at: row.created_at,
     updated_at: row.updated_at,
@@ -160,7 +170,7 @@ adminStandpunten.use("/*", requireApiKey);
 
 adminStandpunten.post("/", async (c) => {
   const body = await c.req.json();
-  const { slug, titel, categorie, samenvatting, inhoud, kernwaarden } = body;
+  const { slug, titel, categorie, samenvatting, inhoud, kernwaarden, cijfers, maatregelen, juridisch, beperkingen, bronnen } = body;
 
   if (!slug || !titel || !categorie || !samenvatting || !inhoud) {
     return c.json(
@@ -178,13 +188,16 @@ adminStandpunten.post("/", async (c) => {
   }
 
   const kernwaardenJson = kernwaarden ? JSON.stringify(kernwaarden) : null;
+  const cijfersJson = cijfers ? JSON.stringify(cijfers) : null;
+  const maatregelenJson = maatregelen ? JSON.stringify(maatregelen) : null;
+  const bronnenJson = bronnen ? JSON.stringify(bronnen) : null;
 
   const result = db
     .query(
-      `INSERT INTO standpunten (slug, titel, categorie, samenvatting, inhoud, kernwaarden)
-       VALUES (?, ?, ?, ?, ?, ?)`
+      `INSERT INTO standpunten (slug, titel, categorie, samenvatting, inhoud, kernwaarden, cijfers, maatregelen, juridisch, beperkingen, bronnen)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
-    .run(slug, titel, categorie, samenvatting, inhoud, kernwaardenJson);
+    .run(slug, titel, categorie, samenvatting, inhoud, kernwaardenJson, cijfersJson, maatregelenJson, juridisch ?? null, beperkingen ?? null, bronnenJson);
 
   const created = db
     .query("SELECT * FROM standpunten WHERE id = ?")
@@ -196,7 +209,7 @@ adminStandpunten.post("/", async (c) => {
 adminStandpunten.put("/:slug", async (c) => {
   const slug = c.req.param("slug");
   const body = await c.req.json();
-  const { titel, categorie, samenvatting, inhoud, kernwaarden, gewijzigd_door, wijziging_reden } = body;
+  const { titel, categorie, samenvatting, inhoud, kernwaarden, cijfers, maatregelen, juridisch, beperkingen, bronnen, gewijzigd_door, wijziging_reden } = body;
 
   const existing = db
     .query("SELECT * FROM standpunten WHERE slug = ?")
@@ -206,7 +219,6 @@ adminStandpunten.put("/:slug", async (c) => {
     return c.json({ error: "Standpunt niet gevonden" }, 404);
   }
 
-  // Sla huidige versie op in historie
   db.query(
     `INSERT INTO standpunten_historie (standpunt_id, titel, categorie, samenvatting, inhoud, versie, gewijzigd_door, wijziging_reden)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
@@ -225,9 +237,12 @@ adminStandpunten.put("/:slug", async (c) => {
   const newCategorie = categorie ?? existing.categorie;
   const newSamenvatting = samenvatting ?? existing.samenvatting;
   const newInhoud = inhoud ?? existing.inhoud;
-  const newKernwaarden = kernwaarden !== undefined
-    ? JSON.stringify(kernwaarden)
-    : existing.kernwaarden;
+  const newKernwaarden = kernwaarden !== undefined ? JSON.stringify(kernwaarden) : existing.kernwaarden;
+  const newCijfers = cijfers !== undefined ? JSON.stringify(cijfers) : existing.cijfers;
+  const newMaatregelen = maatregelen !== undefined ? JSON.stringify(maatregelen) : existing.maatregelen;
+  const newJuridisch = juridisch !== undefined ? juridisch : existing.juridisch;
+  const newBeperkingen = beperkingen !== undefined ? beperkingen : existing.beperkingen;
+  const newBronnen = bronnen !== undefined ? JSON.stringify(bronnen) : existing.bronnen;
   const newVersie = existing.versie + 1;
 
   const newStatus = existing.status === "programma" || existing.status === "gewijzigd"
@@ -236,9 +251,9 @@ adminStandpunten.put("/:slug", async (c) => {
 
   db.query(
     `UPDATE standpunten
-     SET titel = ?, categorie = ?, samenvatting = ?, inhoud = ?, kernwaarden = ?, versie = ?, status = ?, updated_at = datetime('now')
+     SET titel = ?, categorie = ?, samenvatting = ?, inhoud = ?, kernwaarden = ?, cijfers = ?, maatregelen = ?, juridisch = ?, beperkingen = ?, bronnen = ?, versie = ?, status = ?, updated_at = datetime('now')
      WHERE slug = ?`
-  ).run(newTitel, newCategorie, newSamenvatting, newInhoud, newKernwaarden, newVersie, newStatus, slug);
+  ).run(newTitel, newCategorie, newSamenvatting, newInhoud, newKernwaarden, newCijfers, newMaatregelen, newJuridisch, newBeperkingen, newBronnen, newVersie, newStatus, slug);
 
   const updated = db
     .query("SELECT * FROM standpunten WHERE slug = ?")
