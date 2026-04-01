@@ -2027,6 +2027,343 @@ footer a:hover { color: var(--text); }
   .filter-label { min-width: auto; }
 }
 
+/* ——— DISCUSSIE ——— */
+.discussie-container {
+  border-top: 1px solid var(--border);
+}
+
+.discussie {
+  padding: var(--space-lg);
+}
+
+.discussie-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.discussie-header h4 {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.discussie-header h4 i {
+  font-size: 1rem;
+  font-style: normal;
+  color: var(--accent);
+}
+
+.discussie-sort {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.discussie-sort-btn {
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  background: var(--bg);
+  font-family: var(--font);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.discussie-sort-btn:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+.discussie-sort-btn.active {
+  background: var(--text);
+  color: var(--white);
+  border-color: var(--text);
+}
+
+.discussie-form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.discussie-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.discussie-form-field {
+  position: relative;
+  margin-bottom: var(--space-sm);
+}
+
+.discussie-form-field:last-child {
+  margin-bottom: 0;
+}
+
+.discussie-input {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 0.85rem;
+  color: var(--text);
+  background: var(--white);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.discussie-input:focus {
+  border-color: var(--accent);
+}
+
+.discussie-input::placeholder {
+  color: var(--text-muted);
+}
+
+.discussie-textarea {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 0.85rem;
+  color: var(--text);
+  background: var(--white);
+  outline: none;
+  resize: vertical;
+  min-height: 80px;
+  transition: border-color 0.2s;
+}
+
+.discussie-textarea:focus {
+  border-color: var(--accent);
+}
+
+.discussie-textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.discussie-charcount {
+  display: block;
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.discussie-form-actions {
+  margin-top: var(--space-sm);
+}
+
+.discussie-form-actions .discussie-submit {
+  padding: 0.55rem 1.2rem;
+  font-size: 0.82rem;
+}
+
+.discussie-form-feedback {
+  margin-top: var(--space-sm);
+  font-size: 0.82rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+}
+
+.discussie-form-feedback--success {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.discussie-form-feedback--error {
+  background: var(--danger-light);
+  color: var(--danger);
+}
+
+.discussie-lijst {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.discussie-leeg,
+.discussie-laden {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: var(--space-md) 0;
+}
+
+.discussie-reactie {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+}
+
+.discussie-reactie--reply {
+  margin-top: var(--space-sm);
+  margin-left: var(--space-lg);
+  border-left: 2px solid var(--accent);
+  background: var(--bg);
+}
+
+.discussie-reactie--verborgen {
+  opacity: 0.5;
+}
+
+.discussie-verborgen-tekst {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.discussie-reactie-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.discussie-naam {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.discussie-datum {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.discussie-inhoud {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: var(--space-sm);
+}
+
+.discussie-reactie-acties {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.discussie-stemmen {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.discussie-stem-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.15rem;
+  color: var(--text-muted);
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.discussie-stem-btn i {
+  font-size: 0.9rem;
+  font-style: normal;
+}
+
+.discussie-stem-btn:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.discussie-stem-btn:disabled {
+  cursor: default;
+}
+
+.discussie-stem--active {
+  color: var(--accent) !important;
+}
+
+.discussie-score {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text);
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+.discussie-reply-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.discussie-reply-btn:hover {
+  color: var(--text);
+}
+
+.discussie-reply-btn i {
+  font-size: 0.8rem;
+  font-style: normal;
+}
+
+.discussie-reply-form {
+  margin-top: var(--space-sm);
+}
+
+.vraag-discussie-toggle-wrap {
+  padding: var(--space-sm) var(--space-lg) var(--space-md);
+}
+
+.vraag-discussie-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--accent-label);
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.vraag-discussie-toggle:hover {
+  color: var(--text);
+}
+
+.vraag-discussie-toggle i {
+  font-size: 0.9rem;
+  font-style: normal;
+}
+
+@media (max-width: 768px) {
+  .discussie-form-row { grid-template-columns: 1fr; }
+  .discussie-reactie--reply { margin-left: var(--space-md); }
+}
+
 /* ——— REDUCED MOTION ——— */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

@@ -93,6 +93,7 @@
 </div>
 
 <script src="/js/main.js"></script>
+<script src="/js/discussie.js"></script>
 <script>
 (function () {
   var API = '/api';
@@ -220,6 +221,10 @@
         (v.context ? '<div class="vraag-context" hidden><p>' + escapeHtml(v.context) + '</p></div>' : '') +
         antwoordHtml +
         stemHtml +
+        '<div class="vraag-discussie-toggle-wrap">' +
+          '<button class="vraag-discussie-toggle" data-slug="' + escapeAttr(v.slug) + '"><i class="lucide lucide-message-circle" aria-hidden="true"></i> Discussie</button>' +
+        '</div>' +
+        '<div class="discussie-container" data-disc-type="vraag" data-disc-slug="' + escapeAttr(v.slug) + '" hidden></div>' +
       '</div>';
     }).join('');
   }
@@ -244,7 +249,7 @@
     renderList();
   });
 
-  // Context toggle + Stemmen
+  // Context toggle + Stemmen + Discussie
   list.addEventListener('click', function (e) {
     var ctxBtn = e.target.closest('.vraag-context-toggle');
     if (ctxBtn) {
@@ -256,6 +261,19 @@
       ctxBtn.innerHTML = expanded
         ? '<i class="lucide lucide-chevron-down" aria-hidden="true"></i> Context'
         : '<i class="lucide lucide-chevron-up" aria-hidden="true"></i> Verberg context';
+      return;
+    }
+
+    var discBtn = e.target.closest('.vraag-discussie-toggle');
+    if (discBtn) {
+      var card = discBtn.closest('.vraag-card');
+      var discContainer = card.querySelector('.discussie-container');
+      if (discContainer.hidden) {
+        Discussie.load(discContainer, discContainer.getAttribute('data-disc-type'), discContainer.getAttribute('data-disc-slug'));
+        Discussie.bindEvents(discContainer);
+      } else {
+        discContainer.hidden = true;
+      }
       return;
     }
 

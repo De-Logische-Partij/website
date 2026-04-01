@@ -102,6 +102,7 @@
 </div>
 
 <script src="/js/main.js"></script>
+<script src="/js/discussie.js"></script>
 <script>
 (function () {
   var API = '/api';
@@ -220,6 +221,7 @@
             '<i class="lucide lucide-history" aria-hidden="true"></i> Wijzigingsgeschiedenis' +
           '</button>' +
           '<div class="standpunt-historie" data-slug="' + escapeAttr(s.slug) + '" hidden></div>' +
+          '<div class="discussie-container" data-disc-type="standpunt" data-disc-slug="' + escapeAttr(s.slug) + '" hidden></div>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -309,6 +311,13 @@
       toggleBtn.innerHTML = expanded
         ? '<i class="lucide lucide-chevron-down" aria-hidden="true"></i> Lees meer'
         : '<i class="lucide lucide-chevron-up" aria-hidden="true"></i> Sluiten';
+      if (!expanded) {
+        var discContainer = body.querySelector('.discussie-container');
+        if (discContainer && discContainer.hidden) {
+          Discussie.load(discContainer, discContainer.getAttribute('data-disc-type'), discContainer.getAttribute('data-disc-slug'));
+          Discussie.bindEvents(discContainer);
+        }
+      }
       return;
     }
 

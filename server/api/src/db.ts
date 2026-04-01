@@ -266,6 +266,38 @@ if (vragenCount.n === 0) {
   seedVragen();
 }
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS discussies (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    context_type TEXT NOT NULL,
+    context_slug TEXT NOT NULL,
+    parent_id INTEGER,
+    naam TEXT NOT NULL,
+    email_hash TEXT NOT NULL,
+    inhoud TEXT NOT NULL,
+    stemmen_op INTEGER DEFAULT 0,
+    stemmen_neer INTEGER DEFAULT 0,
+    zichtbaar INTEGER DEFAULT 1,
+    verberg_reden TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (parent_id) REFERENCES discussies(id)
+  )
+`);
+
+db.exec("CREATE INDEX IF NOT EXISTS idx_discussies_context ON discussies(context_type, context_slug)");
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS discussie_stemmen (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    discussie_id INTEGER NOT NULL,
+    ip_hash TEXT NOT NULL,
+    stem TEXT NOT NULL CHECK(stem IN ('op', 'neer')),
+    created_at TEXT DEFAULT (datetime('now')),
+    UNIQUE(discussie_id, ip_hash),
+    FOREIGN KEY (discussie_id) REFERENCES discussies(id)
+  )
+`);
+
 const FACTUUR_5884_HASH = "16b5df41a611cd90450ab1c57382b809936f75ff50f92bf4cb21462c4a5e3fae";
 const FACTUUR_5884_URL = "/receipts/Factuur-5884.pdf";
 
