@@ -2048,6 +2048,89 @@ footer a:hover { color: var(--text); }
   padding: var(--space-sm) 0;
 }
 
+/* Detail page */
+.standpunt-detail-view {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-md) var(--space-2xl);
+}
+
+.sp-detail {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.sp-detail-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  margin-bottom: var(--space-md);
+  transition: color 0.2s;
+}
+
+.sp-detail-back:hover {
+  color: var(--text);
+}
+
+.sp-detail-back i {
+  font-size: 0.9rem;
+  font-style: normal;
+}
+
+.sp-detail-header {
+  padding: var(--space-xl) var(--space-lg) var(--space-lg);
+}
+
+.sp-detail-header h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: var(--space-sm);
+}
+
+.sp-detail-header h1 s {
+  text-decoration: line-through;
+  text-decoration-color: var(--danger);
+}
+
+.sp-detail-samenvatting {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin-bottom: var(--space-sm);
+}
+
+.standpunt-lees-meer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--accent-label);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.standpunt-lees-meer:hover {
+  color: var(--text);
+}
+
+.standpunt-lees-meer i {
+  font-size: 0.85rem;
+  font-style: normal;
+  transition: transform 0.2s;
+}
+
+.standpunt-lees-meer:hover i {
+  transform: translateX(3px);
+}
+
 @media (max-width: 768px) {
   .standpunten-grid { grid-template-columns: 1fr; }
   .standpunten-callout { padding: var(--space-md); }
@@ -2056,6 +2139,9 @@ footer a:hover { color: var(--text); }
   .sp-panel { padding: var(--space-md); }
   .cijfer-card { flex-direction: column; align-items: flex-start; gap: 0.15rem; }
   .cijfer-card + .cijfer-card { border-left: none; border-top: 1px solid var(--border); padding-left: var(--space-sm); padding-top: var(--space-xs); }
+  .standpunt-detail-view { padding: var(--space-lg) var(--space-sm) var(--space-xl); }
+  .sp-detail-header { padding: var(--space-lg) var(--space-md) var(--space-md); }
+  .sp-detail-header h1 { font-size: 1.3rem; }
 }
 
 /* ——— VRAGEN ——— */

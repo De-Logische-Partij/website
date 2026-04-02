@@ -53,12 +53,12 @@
 
   <section class="standpunten-section" id="standpunten">
     <div class="section-inner">
-      <div class="standpunten-callout">
+      <div class="standpunten-callout" id="standpunten-callout">
         <h3>Waarom standpunten kunnen veranderen</h3>
         <p>Wij geloven in gevalideerd denken. Dat betekent dat we onze standpunten aanpassen als nieuwe inzichten, data of ervaringen daar aanleiding toe geven. Een standpunt dat achterhaald blijkt, vervangen we door een beter onderbouwd alternatief. Dat is geen zwakte, dat is hoe logisch denken werkt. We claimen niet alles zeker te weten. We zijn eerlijk over wat we nog onderzoeken en transparant over wat er verandert en waarom.</p>
       </div>
 
-      <div class="standpunten-filters">
+      <div class="standpunten-filters" id="standpunten-filters">
         <div class="standpunten-search">
           <i class="lucide lucide-search standpunten-search-icon" aria-hidden="true"></i>
           <label for="standpunten-zoek" class="sr-only">Zoek standpunten</label>
@@ -87,6 +87,10 @@
       </div>
 
       <p class="standpunten-empty" id="standpunten-empty" hidden>Geen standpunten gevonden voor deze zoekopdracht.</p>
+
+      <div class="standpunt-detail-view" id="standpunt-detail" hidden>
+        <p class="standpunten-status">Standpunt wordt geladen...</p>
+      </div>
     </div>
   </section>
 </main>
@@ -106,12 +110,15 @@
 <script>
 (function () {
   var API = '/api';
+  var heroSection = document.querySelector('.hero');
+  var callout = document.getElementById('standpunten-callout');
+  var filters = document.getElementById('standpunten-filters');
   var grid = document.getElementById('standpunten-grid');
   var status = document.getElementById('standpunten-status');
   var emptyMsg = document.getElementById('standpunten-empty');
+  var detailView = document.getElementById('standpunt-detail');
   var searchInput = document.getElementById('standpunten-zoek');
   var categoriesWrap = document.getElementById('standpunten-categories');
-
   var statusesWrap = document.getElementById('standpunten-statuses');
 
   var allStandpunten = [];
@@ -126,134 +133,36 @@
     ingetrokken:    { label: 'Ingetrokken',    cssClass: 'badge--ingetrokken' }
   };
 
-  function loadCategories() {
-    fetch(API + '/standpunten/categorieen')
-      .then(function (res) { return res.json(); })
-      .then(function (cats) {
-        var list = Array.isArray(cats) ? cats : (cats.categorieen || []);
-        list.forEach(function (cat) {
-          var btn = document.createElement('button');
-          btn.className = 'cat-btn';
-          btn.setAttribute('data-category', cat);
-          btn.textContent = cat;
-          categoriesWrap.appendChild(btn);
-        });
-      })
-      .catch(function () {});
-  }
-
-  function loadStandpunten() {
-    fetch(API + '/standpunten')
-      .then(function (res) { return res.json(); })
-      .then(function (data) {
-        allStandpunten = Array.isArray(data) ? data : (data.standpunten || []);
-        renderGrid();
-        initFromUrl();
-      })
-      .catch(function () {
-        status.textContent = 'Kan standpunten niet laden. Probeer het later opnieuw.';
-      });
-  }
-
-  function renderGrid() {
-    var query = searchInput.value.trim().toLowerCase();
-    var filtered = allStandpunten.filter(function (s) {
-      var matchCat = activeCategory === 'alle' || s.categorie === activeCategory;
-      var matchStatus = activeStatus === 'alle' || s.status === activeStatus;
-      var matchQuery = !query ||
-        s.titel.toLowerCase().indexOf(query) !== -1 ||
-        (s.samenvatting && s.samenvatting.toLowerCase().indexOf(query) !== -1) ||
-        (s.inhoud && s.inhoud.toLowerCase().indexOf(query) !== -1);
-      return matchCat && matchStatus && matchQuery;
-    });
-
-    if (!allStandpunten.length) return;
-
-    if (!filtered.length) {
-      grid.innerHTML = '';
-      emptyMsg.hidden = false;
-      return;
+  function getSlugFromUrl() {
+    var path = window.location.pathname.replace(/\/$/, '');
+    var parts = path.split('/');
+    if (parts.length >= 3 && parts[1] === 'standpunten' && parts[2]) {
+      return decodeURIComponent(parts[2]);
     }
+    return null;
+  }
 
-    emptyMsg.hidden = true;
-    grid.innerHTML = filtered.map(function (s) {
-      var st = s.status || 'programma';
-      var cfg = statusConfig[st] || statusConfig.programma;
-      var isIngetrokken = st === 'ingetrokken';
-      var isRectificeerd = st === 'gerectificeerd';
-      var isGewijzigd = st === 'gewijzigd';
+  var pageSlug = getSlugFromUrl();
+  var isDetailPage = !!pageSlug;
 
-      var cardClass = 'standpunt-card' + (isIngetrokken ? ' standpunt-card--ingetrokken' : '');
-      var titelHtml = isIngetrokken
-        ? '<h3><s>' + escapeHtml(s.titel) + '</s></h3>'
-        : '<h3>' + escapeHtml(s.titel) + '</h3>';
+  // --- Shared helpers ---
 
-      var extraContent = '';
-      if (isIngetrokken && s.intrekking_reden) {
-        extraContent += '<div class="standpunt-intrekking">' +
-          '<strong>Reden van intrekking</strong>' +
-          '<p>' + escapeHtml(s.intrekking_reden) + '</p>' +
-        '</div>';
-      }
-      if (isRectificeerd && s.rectificatie_tekst) {
-        extraContent += '<div class="standpunt-rectificatie">' +
-          '<strong>Rectificatie</strong>' +
-          '<p>' + escapeHtml(s.rectificatie_tekst) + '</p>' +
-        '</div>';
-      }
+  function parseField(val) {
+    if (!val) return val;
+    if (typeof val === 'string') {
+      try { return JSON.parse(val); } catch (e) { return val; }
+    }
+    return val;
+  }
 
-      var wijzigingHtml = '';
-      if (s.updated_at && s.created_at && s.updated_at !== s.created_at) {
-        wijzigingHtml = '<span class="standpunt-wijziging-datum">Laatste wijziging: ' + escapeHtml(s.updated_at) + '</span>';
-      }
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
 
-      return '<div class="' + cardClass + '" data-slug="' + escapeAttr(s.slug) + '">' +
-        '<div class="standpunt-header">' +
-          '<div class="standpunt-badges">' +
-            '<span class="badge badge--standpunt">' + escapeHtml(s.categorie) + '</span>' +
-            '<span class="badge ' + cfg.cssClass + '">' + escapeHtml(cfg.label) + '</span>' +
-          '</div>' +
-          titelHtml +
-          '<p>' + escapeHtml(s.samenvatting || '') + '</p>' +
-          wijzigingHtml +
-          extraContent +
-          '<button class="standpunt-toggle" aria-expanded="false">' +
-            '<i class="lucide lucide-chevron-down" aria-hidden="true"></i> Lees meer' +
-          '</button>' +
-        '</div>' +
-        '<div class="standpunt-body" hidden>' +
-          '<nav class="sp-tabs">' +
-            '<button class="sp-tab active" data-tab="overzicht"><i class="lucide lucide-file-text" aria-hidden="true"></i> Overzicht</button>' +
-            '<button class="sp-tab" data-tab="onderbouwing"><i class="lucide lucide-scale" aria-hidden="true"></i> Onderbouwing</button>' +
-            '<button class="sp-tab" data-tab="financieel"><i class="lucide lucide-bar-chart-3" aria-hidden="true"></i> Financieel</button>' +
-            '<button class="sp-tab" data-tab="discussie"><i class="lucide lucide-message-circle" aria-hidden="true"></i> Discussie</button>' +
-          '</nav>' +
-          '<div class="sp-panel active" data-panel="overzicht">' +
-            '<div class="standpunt-inhoud">' + formatInhoud(s.inhoud || s.samenvatting || '') + '</div>' +
-            renderCijfers(parseField(s.cijfers)) +
-            renderMaatregelen(parseField(s.maatregelen)) +
-          '</div>' +
-          '<div class="sp-panel" data-panel="onderbouwing">' +
-            renderJuridisch(s.juridisch) +
-            renderBeperkingen(s.beperkingen) +
-            renderBronnen(parseField(s.bronnen)) +
-            '<button class="standpunt-historie-btn" data-slug="' + escapeAttr(s.slug) + '">' +
-              '<i class="lucide lucide-history" aria-hidden="true"></i> Wijzigingsgeschiedenis' +
-            '</button>' +
-            '<div class="standpunt-historie" data-slug="' + escapeAttr(s.slug) + '" hidden></div>' +
-          '</div>' +
-          '<div class="sp-panel" data-panel="financieel">' +
-            '<div class="standpunt-begroting" data-slug="' + escapeAttr(s.slug) + '" hidden></div>' +
-          '</div>' +
-          '<div class="sp-panel" data-panel="discussie">' +
-            '<div class="discussie-container" data-disc-type="standpunt" data-disc-slug="' + escapeAttr(s.slug) + '" hidden></div>' +
-          '</div>' +
-          '<div class="sp-footer">' +
-            '<a href="/standpunten/' + escapeAttr(s.slug) + '" class="standpunt-deel-link"><i class="lucide lucide-link" aria-hidden="true"></i> Deel dit standpunt</a>' +
-          '</div>' +
-        '</div>' +
-      '</div>';
-    }).join('');
+  function escapeAttr(str) {
+    return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
   }
 
   function formatInhoud(text) {
@@ -320,28 +229,9 @@
     '</div>';
   }
 
-  function parseField(val) {
-    if (!val) return val;
-    if (typeof val === 'string') {
-      try { return JSON.parse(val); } catch (e) { return val; }
-    }
-    return val;
-  }
-
-  function escapeHtml(str) {
-    var div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
-
-  function escapeAttr(str) {
-    return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-  }
-
   function loadHistorie(slug, container) {
     container.innerHTML = '<p class="historie-loading">Geschiedenis laden...</p>';
     container.hidden = false;
-
     fetch(API + '/standpunten/' + encodeURIComponent(slug) + '/historie')
       .then(function (res) { return res.json(); })
       .then(function (data) {
@@ -367,37 +257,9 @@
       });
   }
 
-  // Event: category filter
-  categoriesWrap.addEventListener('click', function (e) {
-    var btn = e.target.closest('.cat-btn');
-    if (!btn) return;
-    categoriesWrap.querySelectorAll('.cat-btn').forEach(function (b) { b.classList.remove('active'); });
-    btn.classList.add('active');
-    activeCategory = btn.getAttribute('data-category');
-    renderGrid();
-  });
-
-  // Event: status filter
-  statusesWrap.addEventListener('click', function (e) {
-    var btn = e.target.closest('.status-btn');
-    if (!btn) return;
-    statusesWrap.querySelectorAll('.status-btn').forEach(function (b) { b.classList.remove('active'); });
-    btn.classList.add('active');
-    activeStatus = btn.getAttribute('data-status');
-    renderGrid();
-  });
-
-  // Event: search
-  var searchTimer;
-  searchInput.addEventListener('input', function () {
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(renderGrid, 200);
-  });
-
   function loadBegroting(slug, container) {
     if (container.getAttribute('data-loaded')) return;
     container.setAttribute('data-loaded', '1');
-
     fetch(API + '/standpunten/' + encodeURIComponent(slug) + '/begroting')
       .then(function (res) { return res.ok ? res.json() : null; })
       .then(function (data) {
@@ -421,20 +283,20 @@
       .catch(function () {});
   }
 
-  function activateTab(card, tabName) {
-    card.querySelectorAll('.sp-tab').forEach(function (t) {
+  function activateTab(container, tabName) {
+    container.querySelectorAll('.sp-tab').forEach(function (t) {
       t.classList.toggle('active', t.getAttribute('data-tab') === tabName);
     });
-    card.querySelectorAll('.sp-panel').forEach(function (p) {
+    container.querySelectorAll('.sp-panel').forEach(function (p) {
       p.classList.toggle('active', p.getAttribute('data-panel') === tabName);
     });
-    var slug = card.getAttribute('data-slug');
+    var slug = container.getAttribute('data-slug');
     if (tabName === 'financieel') {
-      var bc = card.querySelector('.standpunt-begroting[data-slug="' + slug + '"]');
+      var bc = container.querySelector('.standpunt-begroting[data-slug="' + slug + '"]');
       if (bc) loadBegroting(slug, bc);
     }
     if (tabName === 'discussie') {
-      var dc = card.querySelector('.discussie-container');
+      var dc = container.querySelector('.discussie-container');
       if (dc && dc.hidden) {
         Discussie.load(dc, dc.getAttribute('data-disc-type'), dc.getAttribute('data-disc-slug'));
         Discussie.bindEvents(dc);
@@ -442,74 +304,217 @@
     }
   }
 
-  // Event: accordion toggle, tabs, historie
-  grid.addEventListener('click', function (e) {
-    var toggleBtn = e.target.closest('.standpunt-toggle');
-    if (toggleBtn) {
-      var card = toggleBtn.closest('.standpunt-card');
-      var body = card.querySelector('.standpunt-body');
-      var expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
-      toggleBtn.setAttribute('aria-expanded', String(!expanded));
-      body.hidden = expanded;
-      toggleBtn.innerHTML = expanded
-        ? '<i class="lucide lucide-chevron-down" aria-hidden="true"></i> Lees meer'
-        : '<i class="lucide lucide-chevron-up" aria-hidden="true"></i> Sluiten';
+  // --- Detail page ---
+
+  if (isDetailPage) {
+    heroSection.hidden = true;
+    callout.hidden = true;
+    filters.hidden = true;
+    grid.hidden = true;
+    emptyMsg.hidden = true;
+    detailView.hidden = false;
+
+    fetch(API + '/standpunten/' + encodeURIComponent(pageSlug))
+      .then(function (res) {
+        if (!res.ok) throw new Error(res.status);
+        return res.json();
+      })
+      .then(function (s) {
+        document.title = escapeHtml(s.titel) + ' | De Logische Partij';
+
+        var st = s.status || 'programma';
+        var cfg = statusConfig[st] || statusConfig.programma;
+        var isIngetrokken = st === 'ingetrokken';
+
+        var wijzigingHtml = '';
+        if (s.updated_at && s.created_at && s.updated_at !== s.created_at) {
+          wijzigingHtml = '<span class="standpunt-wijziging-datum">Laatste wijziging: ' + escapeHtml(s.updated_at) + '</span>';
+        }
+
+        detailView.innerHTML = '<div class="sp-detail" data-slug="' + escapeAttr(s.slug) + '">' +
+          '<a href="/standpunten/" class="sp-detail-back"><i class="lucide lucide-arrow-left" aria-hidden="true"></i> Alle standpunten</a>' +
+          '<div class="sp-detail-header">' +
+            '<div class="standpunt-badges">' +
+              '<span class="badge badge--standpunt">' + escapeHtml(s.categorie || '') + '</span>' +
+              '<span class="badge ' + cfg.cssClass + '">' + escapeHtml(cfg.label) + '</span>' +
+            '</div>' +
+            (isIngetrokken
+              ? '<h1><s>' + escapeHtml(s.titel) + '</s></h1>'
+              : '<h1>' + escapeHtml(s.titel) + '</h1>') +
+            '<p class="sp-detail-samenvatting">' + escapeHtml(s.samenvatting || '') + '</p>' +
+            wijzigingHtml +
+          '</div>' +
+          '<nav class="sp-tabs">' +
+            '<button class="sp-tab active" data-tab="overzicht"><i class="lucide lucide-file-text" aria-hidden="true"></i> Overzicht</button>' +
+            '<button class="sp-tab" data-tab="onderbouwing"><i class="lucide lucide-scale" aria-hidden="true"></i> Onderbouwing</button>' +
+            '<button class="sp-tab" data-tab="financieel"><i class="lucide lucide-bar-chart-3" aria-hidden="true"></i> Financieel</button>' +
+            '<button class="sp-tab" data-tab="discussie"><i class="lucide lucide-message-circle" aria-hidden="true"></i> Discussie</button>' +
+          '</nav>' +
+          '<div class="sp-panel active" data-panel="overzicht">' +
+            '<div class="standpunt-inhoud">' + formatInhoud(s.inhoud || s.samenvatting || '') + '</div>' +
+            renderCijfers(parseField(s.cijfers)) +
+            renderMaatregelen(parseField(s.maatregelen)) +
+          '</div>' +
+          '<div class="sp-panel" data-panel="onderbouwing">' +
+            renderJuridisch(s.juridisch) +
+            renderBeperkingen(s.beperkingen) +
+            renderBronnen(parseField(s.bronnen)) +
+            '<button class="standpunt-historie-btn" data-slug="' + escapeAttr(s.slug) + '">' +
+              '<i class="lucide lucide-history" aria-hidden="true"></i> Wijzigingsgeschiedenis' +
+            '</button>' +
+            '<div class="standpunt-historie" data-slug="' + escapeAttr(s.slug) + '" hidden></div>' +
+          '</div>' +
+          '<div class="sp-panel" data-panel="financieel">' +
+            '<div class="standpunt-begroting" data-slug="' + escapeAttr(s.slug) + '" hidden></div>' +
+          '</div>' +
+          '<div class="sp-panel" data-panel="discussie">' +
+            '<div class="discussie-container" data-disc-type="standpunt" data-disc-slug="' + escapeAttr(s.slug) + '" hidden></div>' +
+          '</div>' +
+          '<div class="sp-footer">' +
+            '<a href="/standpunten/' + escapeAttr(s.slug) + '" class="standpunt-deel-link"><i class="lucide lucide-link" aria-hidden="true"></i> Deel dit standpunt</a>' +
+          '</div>' +
+        '</div>';
+
+        detailView.addEventListener('click', function (e) {
+          var tabBtn = e.target.closest('.sp-tab');
+          if (tabBtn) {
+            activateTab(detailView.querySelector('.sp-detail'), tabBtn.getAttribute('data-tab'));
+            return;
+          }
+          var histBtn = e.target.closest('.standpunt-historie-btn');
+          if (histBtn) {
+            var slug = histBtn.getAttribute('data-slug');
+            var container = detailView.querySelector('.standpunt-historie[data-slug="' + slug + '"]');
+            if (container.hidden) {
+              loadHistorie(slug, container);
+            } else {
+              container.hidden = true;
+            }
+          }
+        });
+      })
+      .catch(function () {
+        detailView.innerHTML = '<a href="/standpunten/" class="sp-detail-back"><i class="lucide lucide-arrow-left" aria-hidden="true"></i> Alle standpunten</a>' +
+          '<p class="standpunten-status">Kan dit standpunt niet laden. Mogelijk bestaat het niet meer.</p>';
+      });
+
+    return;
+  }
+
+  // --- Grid page ---
+
+  function loadCategories() {
+    fetch(API + '/standpunten/categorieen')
+      .then(function (res) { return res.json(); })
+      .then(function (cats) {
+        var list = Array.isArray(cats) ? cats : (cats.categorieen || []);
+        list.forEach(function (cat) {
+          var btn = document.createElement('button');
+          btn.className = 'cat-btn';
+          btn.setAttribute('data-category', cat);
+          btn.textContent = cat;
+          categoriesWrap.appendChild(btn);
+        });
+      })
+      .catch(function () {});
+  }
+
+  function loadStandpunten() {
+    fetch(API + '/standpunten')
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        allStandpunten = Array.isArray(data) ? data : (data.standpunten || []);
+        renderGrid();
+      })
+      .catch(function () {
+        status.textContent = 'Kan standpunten niet laden. Probeer het later opnieuw.';
+      });
+  }
+
+  function renderGrid() {
+    var query = searchInput.value.trim().toLowerCase();
+    var filtered = allStandpunten.filter(function (s) {
+      var matchCat = activeCategory === 'alle' || s.categorie === activeCategory;
+      var matchStatus = activeStatus === 'alle' || s.status === activeStatus;
+      var matchQuery = !query ||
+        s.titel.toLowerCase().indexOf(query) !== -1 ||
+        (s.samenvatting && s.samenvatting.toLowerCase().indexOf(query) !== -1) ||
+        (s.inhoud && s.inhoud.toLowerCase().indexOf(query) !== -1);
+      return matchCat && matchStatus && matchQuery;
+    });
+
+    if (!allStandpunten.length) return;
+
+    if (!filtered.length) {
+      grid.innerHTML = '';
+      emptyMsg.hidden = false;
       return;
     }
 
-    var tabBtn = e.target.closest('.sp-tab');
-    if (tabBtn) {
-      var card = tabBtn.closest('.standpunt-card');
-      activateTab(card, tabBtn.getAttribute('data-tab'));
-      return;
-    }
+    emptyMsg.hidden = true;
+    grid.innerHTML = filtered.map(function (s) {
+      var st = s.status || 'programma';
+      var cfg = statusConfig[st] || statusConfig.programma;
+      var isIngetrokken = st === 'ingetrokken';
 
-    var histBtn = e.target.closest('.standpunt-historie-btn');
-    if (histBtn) {
-      var slug = histBtn.getAttribute('data-slug');
-      var container = histBtn.parentNode.querySelector('.standpunt-historie[data-slug="' + slug + '"]');
-      if (container.hidden) {
-        loadHistorie(slug, container);
-      } else {
-        container.hidden = true;
+      var cardClass = 'standpunt-card' + (isIngetrokken ? ' standpunt-card--ingetrokken' : '');
+      var titelHtml = isIngetrokken
+        ? '<h3><s>' + escapeHtml(s.titel) + '</s></h3>'
+        : '<h3>' + escapeHtml(s.titel) + '</h3>';
+
+      var extraContent = '';
+      if (isIngetrokken && s.intrekking_reden) {
+        extraContent += '<div class="standpunt-intrekking">' +
+          '<strong>Reden van intrekking</strong>' +
+          '<p>' + escapeHtml(s.intrekking_reden) + '</p>' +
+        '</div>';
       }
-    }
+
+      var wijzigingHtml = '';
+      if (s.updated_at && s.created_at && s.updated_at !== s.created_at) {
+        wijzigingHtml = '<span class="standpunt-wijziging-datum">Laatste wijziging: ' + escapeHtml(s.updated_at) + '</span>';
+      }
+
+      return '<div class="' + cardClass + '">' +
+        '<div class="standpunt-header">' +
+          '<div class="standpunt-badges">' +
+            '<span class="badge badge--standpunt">' + escapeHtml(s.categorie) + '</span>' +
+            '<span class="badge ' + cfg.cssClass + '">' + escapeHtml(cfg.label) + '</span>' +
+          '</div>' +
+          titelHtml +
+          '<p>' + escapeHtml(s.samenvatting || '') + '</p>' +
+          wijzigingHtml +
+          extraContent +
+          '<a href="/standpunten/' + escapeAttr(s.slug) + '" class="standpunt-lees-meer">' +
+            '<i class="lucide lucide-arrow-right" aria-hidden="true"></i> Lees meer' +
+          '</a>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  categoriesWrap.addEventListener('click', function (e) {
+    var btn = e.target.closest('.cat-btn');
+    if (!btn) return;
+    categoriesWrap.querySelectorAll('.cat-btn').forEach(function (b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    activeCategory = btn.getAttribute('data-category');
+    renderGrid();
   });
 
-  function getSlugFromUrl() {
-    var path = window.location.pathname.replace(/\/$/, '');
-    var parts = path.split('/');
-    if (parts.length >= 3 && parts[1] === 'standpunten' && parts[2]) {
-      return decodeURIComponent(parts[2]);
-    }
-    var hash = window.location.hash.replace('#', '');
-    return hash || null;
-  }
+  statusesWrap.addEventListener('click', function (e) {
+    var btn = e.target.closest('.status-btn');
+    if (!btn) return;
+    statusesWrap.querySelectorAll('.status-btn').forEach(function (b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    activeStatus = btn.getAttribute('data-status');
+    renderGrid();
+  });
 
-  function openStandpunt(slug) {
-    if (!slug) return;
-    var card = grid.querySelector('.standpunt-card[data-slug="' + slug + '"]');
-    if (!card) return;
-    var toggle = card.querySelector('.standpunt-toggle');
-    var body = card.querySelector('.standpunt-body');
-    if (toggle && body && body.hidden) {
-      toggle.setAttribute('aria-expanded', 'true');
-      body.hidden = false;
-      toggle.innerHTML = '<i class="lucide lucide-chevron-up" aria-hidden="true"></i> Sluiten';
-    }
-    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  function initFromUrl() {
-    var slug = getSlugFromUrl();
-    if (slug) {
-      setTimeout(function () { openStandpunt(slug); }, 100);
-    }
-  }
-
-  window.addEventListener('hashchange', function () {
-    var hash = window.location.hash.replace('#', '');
-    if (hash) openStandpunt(hash);
+  var searchTimer;
+  searchInput.addEventListener('input', function () {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(renderGrid, 200);
   });
 
   loadCategories();
